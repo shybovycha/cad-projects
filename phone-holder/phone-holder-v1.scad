@@ -74,7 +74,7 @@ module phone_holder(
     fastener_fixer_height = arm_height;
 
     fastener_body_radius = arm_mount_radius;
-    fastener_body_length = (arm_height * 2) + (fastener_fixer_height * 3);
+    fastener_body_length = (arm_height * 2) + (fastener_fixer_height * 2.25);
 
     fastener_fixer_inner_radius = fastener_body_radius / 2;
     fastener_fixer_outer_radius = fastener_body_radius * 2;
