@@ -64,7 +64,7 @@ module phone_holder(
     a1 = ceil(sqrt(pow(c, 2) - pow(b1, 2)));
 
     // the min_spread gives longest rod + pad at the stopper + thread length
-    non_threaded_part_length = (2 * a0) + (axis_mount_width * 1.5); // + (axis_mount_width);
+    non_threaded_part_length = (2 * a0) + (axis_mount_width * 3);
 
     threaded_part_length = abs(a0 - a1) * 1.25;
 
@@ -233,9 +233,21 @@ module phone_holder(
     {
         union()
         {
-            translate([ 0, 0, 0 ])
-                rotate([ 90, 0, 0 ])
-                    cylinder(h = non_threaded_part_length, r = (axis_width / 2) * 0.8, center = false);
+            difference()
+            {
+                translate([ 0, 0, 0 ])
+                    rotate([ 90, 0, 0 ])
+                        cylinder(h = non_threaded_part_length, r = (axis_width / 2) * 0.8, center = false);
+                
+                translate([ 0, -axis_mount_width / 2, 0 ])
+                    rotate([ 90, 0, 0 ])
+                        difference()
+                        {
+                            cylinder(r = fastener_fixer_outer_radius, h = fastener_fixer_height);
+                            
+                            cylinder(r = fastener_fixer_inner_radius, h = fastener_fixer_height);
+                        }
+            }
 
             translate([ 0, -non_threaded_part_length, 0 ])
                 rotate([ 90, 0, 0 ])
@@ -321,7 +333,7 @@ module phone_holder(
             rotate([ 90, 0, 0 ])
                 arm_fastener();
 
-    for (i = [ 0 : 1 ])
+    for (i = [ 0 : 2 ])
         translate([ -arm_width * (i + 1) * 2, arm_width * 4, 0 ])
             //rotate([ 90, 0, 0 ])
                 arm_fastener_fixer();
