@@ -254,9 +254,21 @@ module phone_holder(
                     trapezoidal_threaded_rod(d = axis_width, l = threaded_part_length, pitch = 2, thread_angle = 15, center = false);
 
 
-            translate([ 0, -(non_threaded_part_length + threaded_part_length), 0])
-                rotate([ 90, 0, 0 ])
-                    cylinder(h = handle_offset_length + axis_mount_width, r = (axis_width / 2) * 0.8, center = false);
+            difference()
+            {
+                translate([ 0, -(non_threaded_part_length + threaded_part_length), 0])
+                    rotate([ 90, 0, 0 ])
+                        cylinder(h = handle_offset_length + axis_mount_width, r = (axis_width / 2) * 0.8, center = false);
+                
+                translate([ 0, -(non_threaded_part_length + threaded_part_length + (axis_mount_width / 2)), 0 ])
+                    rotate([ 90, 0, 0 ])
+                        difference()
+                        {
+                            cylinder(r = fastener_fixer_outer_radius, h = fastener_fixer_height);
+                            
+                            cylinder(r = fastener_fixer_inner_radius, h = fastener_fixer_height);
+                        }
+            }
         }
     }
 
@@ -333,7 +345,7 @@ module phone_holder(
             rotate([ 90, 0, 0 ])
                 arm_fastener();
 
-    for (i = [ 0 : 2 ])
+    for (i = [ 0 : 3 ])
         translate([ -arm_width * (i + 1) * 2, arm_width * 4, 0 ])
             //rotate([ 90, 0, 0 ])
                 arm_fastener_fixer();
