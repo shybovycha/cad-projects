@@ -1,7 +1,8 @@
-// use <BOSL/constants.scad>;
 use <BOSL/threading.scad>;
 use <BOSL/shapes.scad>;
 use <BOSL/involute_gears.scad>;
+
+include <BOSL/constants.scad>;
 
 module phone_holder(closed_width, open_width, back_holder_length, case_height, case_depth)
 {
@@ -79,6 +80,26 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
         }
     }
     
+    module brim(length, height1, height2, depth, thickness, fillet = 2)
+    {
+        union()
+        {
+            cuboid([ length, thickness, height1 ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT, center = false);
+            
+            translate([ 0, 0, -thickness ])
+                cuboid([ length, depth + (2 * thickness), thickness ], fillet = fillet, edges = EDGE_BOT_BK + EDGE_BK_RT + EDGE_BK_LF + EDGE_BOT_FR + EDGE_FR_LF + EDGE_FR_RT + EDGE_BOT_RT + EDGE_BOT_LF, center = false);
+            
+            translate([ 0, depth + thickness, 0 ])
+               cuboid([ length, thickness, height2 ], fillet = fillet, edges = EDGE_TOP_FR + EDGE_TOP_BK + EDGE_BK_LF + EDGE_BK_RT, center = false);
+            
+            translate([ length / 2, thickness, 0 ])
+                interior_fillet(l = length, r = fillet);
+            
+            translate([ length / 2, depth + thickness, 0 ])
+                interior_fillet(l = length, r = fillet, orient = ORIENT_X_90);
+        }
+    }
+    
     top_rail();
     
     translate([ 0, (rack_driver_gear_outer_radius * 2) + (rail_height - rack_tooth_height / 2), 0 ])
@@ -87,6 +108,9 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
     translate([ 0, rack_driver_gear_outer_radius, (rack_driver_gear_thickness / 2) ])
         rotate([ 180, 0, 0 ])
             rack_driver_gear();
+    
+    translate([ 0, -50, 0 ])
+        brim(length = closed_width, height1 = 30, height2 = 10, depth = 12.5, thickness = 5);
 }
 
 $fn = 32;
