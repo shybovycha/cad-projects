@@ -174,18 +174,18 @@ module phone_holder(
                 center = false);
 
                 translate([ 0, joint_width / 2, 0 ])
-                    cylinder(d = joint_width, h = joint_height / 2, center = false);
+                    cylinder(d = joint_width, h = support_height, center = false);
 
                 translate([ joint_length, joint_width / 2, 0 ])
-                    cylinder(d = joint_width, h = joint_height / 2, center = false);
+                    cylinder(d = joint_width, h = support_height, center = false);
             }
 
             // pads for supports
-            translate([ 0, joint_width / 2, arm_height / 2 ])
-                cylinder(r = arm_mount_radius, h = arm_height * 2, center = false);
+            translate([ 0, joint_width / 2, arm_height + (arm_height * 2) ])
+                cylinder(r = arm_mount_radius, h = support_height, center = false);
 
-            translate([ joint_length, joint_width / 2, arm_height / 2 ])
-                cylinder(r = arm_mount_radius, h = arm_height * 2, center = false);
+            translate([ joint_length, joint_width / 2, arm_height + (arm_height * 2) ])
+                cylinder(r = arm_mount_radius, h = support_height, center = false);
         }
     }
 
