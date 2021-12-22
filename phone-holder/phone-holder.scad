@@ -222,7 +222,7 @@ module phone_holder(
 
                     prismoid(size1 = [ axis_mount_length1, axis_mount_width ], size2 = [ axis_mount_length2, axis_mount_width ], h = thread_radius * 2 * 1.5, center = false);
 
-                    translate([ 0, -axis_mount_width, axis_mount_height / 2 ])
+                    translate([ 0, 0, axis_mount_height / 2 ])
                         rotate([ 90, 0, 0 ])
                             cylinder(r = thread_radius, h = axis_mount_width * 1.5, center = true);
                 }
