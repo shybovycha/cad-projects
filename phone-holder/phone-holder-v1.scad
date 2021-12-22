@@ -238,13 +238,13 @@ module phone_holder(
                 translate([ 0, 0, 0 ])
                     rotate([ 90, 0, 0 ])
                         cylinder(h = non_threaded_part_length, r = (axis_width / 2) * 0.8, center = false);
-                
+
                 translate([ 0, -axis_mount_width / 2, 0 ])
                     rotate([ 90, 0, 0 ])
                         difference()
                         {
                             cylinder(r = fastener_fixer_outer_radius, h = fastener_fixer_height);
-                            
+
                             cylinder(r = fastener_fixer_inner_radius, h = fastener_fixer_height);
                         }
             }
@@ -259,13 +259,13 @@ module phone_holder(
                 translate([ 0, -(non_threaded_part_length + threaded_part_length), 0])
                     rotate([ 90, 0, 0 ])
                         cylinder(h = handle_offset_length + axis_mount_width, r = (axis_width / 2) * 0.8, center = false);
-                
+
                 translate([ 0, -(non_threaded_part_length + threaded_part_length + (axis_mount_width / 2)), 0 ])
                     rotate([ 90, 0, 0 ])
                         difference()
                         {
                             cylinder(r = fastener_fixer_outer_radius, h = fastener_fixer_height);
-                            
+
                             cylinder(r = fastener_fixer_inner_radius, h = fastener_fixer_height);
                         }
             }
