@@ -110,12 +110,12 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         union()
         {
             translate([ 0, 0, thread_length / 2 ])
-                cylinder(r = axis_radius, h = axis_rod_length, center = false);
+                cylinder(r = axis_radius, h = (back_holder_length / 2) - (thread_length / 2), center = false);
 
             trapezoidal_threaded_rod(d = axis_radius * 2, l = thread_length, pitch = circular_pitch(mm_per_tooth = rack_mm_per_tooth), thread_depth = rack_tooth_height * 2);
 
-            translate([ 0, 0, - (axis_length + thread_length / 2) ])
-                cylinder(r = axis_radius, h = axis_length, center = false);
+            translate([ 0, 0, - ((back_holder_length / 2) + axis_length) ])
+                cylinder(r = axis_radius, h = (back_holder_length / 2) - (thread_length / 2) + axis_length, center = false);
         }
     }
 
@@ -202,8 +202,8 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         //rotate([ 90, 0, 0 ])
             brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ 0, 30, 0 ])
-        rotate([ 90, 0, 90 ])
+    translate([ 140, 100, 0 ])
+        rotate([ 90, 0, 0 ])
             axis();
             
     translate([ 50, 50, 0 ])
