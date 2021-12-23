@@ -153,11 +153,18 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
     
-    module case_back(fillet = 5)
+    module case_back(fillet = 4)
     {
         difference()
         {
-            cuboid([ closed_width, back_holder_length, rack_thickness + (case_thickness / 2) ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT + EDGE_BK_LF + EDGE_BK_RT, center = false);
+            union()
+            {
+                cuboid([ closed_width, back_holder_length, rack_thickness + (case_thickness / 2) ], fillet = fillet, edges = EDGE_BK_LF + EDGE_BK_RT + EDGE_BOT_LF + EDGE_BOT_RT + EDGE_BOT_BK, center = false);
+                
+                translate([ closed_width / 2, -case_thickness / 2, (rack_thickness + (case_thickness / 2)) / 2 ])
+                    rotate([ -90, 0, 0 ])
+                        prismoid(size1 = [ closed_width, case_thickness / 2 ], size2 = [ closed_width, case_thickness / 3 ], h = case_thickness / 2, center = false);
+            }
             
             translate([ -closed_width / 2, (back_holder_length / 2) + rack_driver_gear_outer_radius, rack_thickness / 2 ])
                 cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
