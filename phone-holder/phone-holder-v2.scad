@@ -4,9 +4,9 @@ use <BOSL/involute_gears.scad>;
 
 include <BOSL/constants.scad>;
 
-module phone_holder(closed_width, open_width, back_holder_length, case_height, case_depth, axis_radius, axis_length)
+module phone_holder(closed_width, open_width, back_holder_length, case_thickness, case_depth, axis_radius, axis_length, side_brim_height1, side_brim_height2, bottom_brim_height1, bottom_brim_height2)
 {
-    rack_travel_distance = (open_width - closed_width) / 2;
+    rack_travel_distance = (open_width - closed_width) * 0.75;
     rack_length = (open_width / 2) + rack_travel_distance;
 
     rack_mm_per_tooth = 1.5;
@@ -29,7 +29,7 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
 
     rack_driver_gear_outer_radius = outer_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_driver_gear_number_of_teeth);
 
-    rail_length = (rack_travel_distance * 2) + rail_non_teethed_length;
+    rail_length = (rack_travel_distance * 2) + rail_non_teethed_length - rack_mm_per_tooth;
 
     groove_depth = rack_thickness / 3;
 
@@ -50,6 +50,21 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
 
                 translate([ rack_travel_distance - rack_mm_per_tooth, -rail_height, 0 ])
                     cube([ rack_travel_distance, rail_height - (rack_tooth_height * 2), rack_thickness ], center = false);
+                
+                // side brim mount
+                translate([ -rail_non_teethed_length - case_thickness / 2, -(rack_tooth_height * 2 + (rail_height - (rack_tooth_height * 2)) / 2), (case_thickness / 2) ])
+                    rotate([ 90, 0, 0 ])
+                        rotate([ 0, 90, 0 ])
+                            prismoid(size1 = [ rail_height - (rack_tooth_height * 2), case_thickness / 2 ], size2 = [ (rail_height - (rack_tooth_height * 2)) / 2, case_thickness / 3 ], h = case_thickness / 2, center = false);
+                
+                // from brim:
+            // prismoid(size1 = [ length * 1.25, thickness / 2 ], size2 = [ length * 1.25, thickness / 3 ], h = (thickness / 2) + PRINTER_SLOP, center = false);
+            // side brim:
+            // brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+            // hence:
+            // prismoid(size1 = [ rail_width, thickness / 2 ], size2 = [ rail_width / 2, thickness / 3 ], h = thickness / 2, center = false)
+            // substitute:
+            // prismoid(size1 = [ rail_height - (rack_tooth_height * 2), case_thickness / 2 ], size2 = [ (rail_height - (rack_tooth_height * 2)) / 2, case_thickness / 3 ], h = case_thickness / 2, center = false)
             }
 
             // groove
@@ -63,11 +78,17 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
         union()
         {
             translate([ -((rail_length / 2) + (2 * rack_mm_per_tooth)), -rail_height, 0 ])
-                cube([ (rack_travel_distance * 2) + rail_non_teethed_length, rail_height - (rack_tooth_height * 2), rack_thickness - groove_depth ], center = false);
+                cube([ (rack_travel_distance * 2) + rail_non_teethed_length - (rack_mm_per_tooth), rail_height - (rack_tooth_height * 2), rack_thickness - groove_depth ], center = false);
 
             // groove mount
             translate([ -(2 * rack_mm_per_tooth), -((rail_height / 2) + rack_tooth_height), rack_thickness - groove_depth ])
-                prismoid(size2 = [ rail_length, (rail_height * 2 / 3) * (1 - PRINTER_SLOP * 2) ], size1 = [ rail_length, (rail_height / 2) * (1 - PRINTER_SLOP * 2) ], h = groove_depth, center = false);
+                prismoid(size1 = [ rail_length, (rail_height / 2) * (1 - PRINTER_SLOP * 2) ], size2 = [ rail_length, (rail_height * 2 / 3) * (1 - PRINTER_SLOP * 2) ], h = groove_depth, center = false);
+            
+            // side brim mount
+            // translate([ ((rack_travel_distance * 2) + rail_non_teethed_length - (rack_mm_per_tooth * 2)) / 2, -(rack_tooth_height * 2 + (rail_height - (rack_tooth_height * 2)) / 2), (case_thickness / 2) ])
+                // rotate([ 90, 0, 0 ])
+                    // rotate([ 0, -90, 0 ])
+                        // prismoid(size1 = [ rail_height - (rack_tooth_height * 2), case_thickness / 2 ], size2 = [ (rail_height - (rack_tooth_height * 2)) / 2, case_thickness / 3 ], h = case_thickness / 2, center = false);
         }
     }
 
@@ -100,28 +121,38 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
 
     module brim(length, height1, height2, depth, thickness, fillet = 2)
     {
-        union()
+        difference()
         {
-            cuboid([ length, thickness, height1 ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT, center = false);
+            union()
+            {
+                cuboid([ length, thickness, height1 ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT, center = false);
 
-            translate([ 0, 0, -thickness ])
-                cuboid([ length, depth + (2 * thickness), thickness ], fillet = fillet, edges = EDGE_BOT_BK + EDGE_BK_RT + EDGE_BK_LF + EDGE_BOT_FR + EDGE_FR_LF + EDGE_FR_RT + EDGE_BOT_RT + EDGE_BOT_LF, center = false);
+                translate([ 0, 0, -thickness ])
+                    cuboid([ length, depth + (2 * thickness), thickness ], fillet = fillet, edges = EDGE_BOT_BK + EDGE_BK_RT + EDGE_BK_LF + EDGE_BOT_FR + EDGE_FR_LF + EDGE_FR_RT + EDGE_BOT_RT + EDGE_BOT_LF, center = false);
 
-            translate([ 0, depth + thickness, 0 ])
-               cuboid([ length, thickness, height2 ], fillet = fillet, edges = EDGE_TOP_FR + EDGE_TOP_BK + EDGE_BK_LF + EDGE_BK_RT, center = false);
+                translate([ 0, depth + thickness, 0 ])
+                   cuboid([ length, thickness, height2 ], fillet = fillet, edges = EDGE_TOP_FR + EDGE_TOP_BK + EDGE_BK_LF + EDGE_BK_RT, center = false);
 
-            translate([ length / 2, thickness, 0 ])
-                interior_fillet(l = length, r = fillet);
+                translate([ length / 2, thickness, 0 ])
+                    interior_fillet(l = length, r = fillet);
 
-            translate([ length / 2, depth + thickness, 0 ])
-                interior_fillet(l = length, r = fillet, orient = ORIENT_X_90);
+                translate([ length / 2, depth + thickness, 0 ])
+                    interior_fillet(l = length, r = fillet, orient = ORIENT_X_90);
+            }
+            
+            // groove
+            translate([ length / 2, thickness / 2, height1 - (thickness / 2) ])
+                prismoid(size1 = [ length * 1.25, thickness / 2 ], size2 = [ length * 1.25, thickness / 3 ], h = (thickness / 2) + PRINTER_SLOP, center = false);
         }
     }
 
-    top_rail();
+    translate([ 0, 0, 0 ])
+        top_rail();
 
-    translate([ 0, (rack_driver_gear_outer_radius * 2) + (rail_height - rack_tooth_height / 2), 0 ])
-        bottom_rail();
+    translate([ rack_travel_distance, (rack_driver_gear_outer_radius * 2), 0 ])
+        rotate([ 0, 0, 180 ])
+            top_rail();
+        // bottom_rail();
 
     translate([ 0, rack_driver_gear_outer_radius, (rack_driver_gear_thickness / 2) ])
         rotate([ 180, 0, 0 ])
@@ -132,7 +163,7 @@ module phone_holder(closed_width, open_width, back_holder_length, case_height, c
 
     translate([ 0, 60, 0 ])
         //rotate([ 90, 0, 0 ])
-            brim(length = closed_width / 2, height1 = 20, height2 = 10, depth = 12.5, thickness = 5);
+            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
 
     translate([ 0, 30, 0 ])
         rotate([ 90, 0, 90 ])
@@ -146,8 +177,12 @@ phone_holder(
     closed_width = 80,
     open_width = 130,
     back_holder_length = 100,
-    case_height = 5,
+    case_thickness = 5,
     case_depth = 12.5,
     axis_radius = 4,
-    axis_length = 30
+    axis_length = 30,
+    side_brim_height1 = 20,
+    side_brim_height2 = 10,
+    bottom_brim_height1 = 20,
+    bottom_brim_height2 = 10
 );
