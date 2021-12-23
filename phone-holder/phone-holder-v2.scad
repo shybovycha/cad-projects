@@ -164,6 +164,40 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
                 translate([ closed_width / 2, -case_thickness / 2, (rack_thickness + (case_thickness / 2)) / 2 ])
                     rotate([ -90, 0, 0 ])
                         prismoid(size1 = [ closed_width, case_thickness / 2 ], size2 = [ closed_width, case_thickness / 3 ], h = case_thickness / 2, center = false);
+                
+                difference()
+                {
+                    union()
+                    {
+                        translate([ (closed_width / 2) + rack_driver_gear_outer_radius, back_holder_length - (case_thickness), rack_thickness + (case_thickness / 2) ])
+                            cube([ axis_radius * 2.5, case_thickness, axis_radius ], center = false);
+                        
+                        translate([ (closed_width / 2) + rack_driver_gear_outer_radius + axis_radius * 1.25, back_holder_length, rack_thickness + (case_thickness / 2) + axis_radius * (1 + PRINTER_SLOP * 2) ])
+                            rotate([ 90, 0, 0 ])
+                                cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+                    }
+                    
+                    translate([ (closed_width / 2) + rack_driver_gear_outer_radius + axis_radius * 1.25, back_holder_length + case_thickness / 2, rack_thickness + (case_thickness / 2) + axis_radius   * (1 + PRINTER_SLOP * 2)])
+                    rotate([ 90, 0, 0 ])
+                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 2, center = false);
+                }
+                
+                difference()
+                {
+                    union()
+                    {
+                        translate([ (closed_width / 2) + rack_driver_gear_outer_radius, 0, rack_thickness + (case_thickness / 2) ])
+                            cube([ axis_radius * 2.5, case_thickness, axis_radius ], center = false);
+                        
+                        translate([ (closed_width / 2) + rack_driver_gear_outer_radius + axis_radius * 1.25, case_thickness, rack_thickness + (case_thickness / 2) + axis_radius * (1 + PRINTER_SLOP * 2) ])
+                            rotate([ 90, 0, 0 ])
+                                cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+                    }
+                    
+                    translate([ (closed_width / 2) + rack_driver_gear_outer_radius + axis_radius * 1.25,  case_thickness * 1.5, rack_thickness + (case_thickness / 2) + axis_radius   * (1 + PRINTER_SLOP * 2)])
+                    rotate([ 90, 0, 0 ])
+                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 2, center = false);
+                }
             }
             
             translate([ -closed_width / 2, (back_holder_length / 2) + rack_driver_gear_outer_radius, rack_thickness / 2 ])
