@@ -147,9 +147,26 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             // hole
             if (hole > 0)
             {
-                translate([ length / 2, (depth + thickness + (depth / 2)) / 2, 0 ])
+                translate([ length / 2, (depth + thickness + (depth / 2) ) / 2, 0 ])
                     cuboid([ hole, depth / 2, thickness * 2 + (2 * PRINTER_SLOP) ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT + EDGE_BK_RT + EDGE_BK_LF);
             }
+        }
+    }
+    
+    module case_back(fillet = 5)
+    {
+        difference()
+        {
+            cuboid([ closed_width, back_holder_length, rack_thickness + (case_thickness / 2) ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT + EDGE_BK_LF + EDGE_BK_RT, center = false);
+            
+            translate([ -closed_width / 2, (back_holder_length / 2) + rack_driver_gear_outer_radius, rack_thickness / 2 ])
+                cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
+            
+            translate([ closed_width / 2, (back_holder_length / 2), rack_thickness / 2 ])
+                    cylinder(r = rack_driver_gear_outer_radius + rack_tooth_height, h = rack_driver_gear_thickness + PRINTER_SLOP, center = false);
+            
+            translate([ -closed_width / 2, (back_holder_length / 2) - rack_driver_gear_outer_radius - (rail_height + rack_tooth_height), rack_thickness / 2 ])
+                cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
         }
     }
 
@@ -181,6 +198,9 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
     translate([ 0, 30, 0 ])
         rotate([ 90, 0, 90 ])
             axis();
+            
+    translate([ 50, 50, 0 ])
+        case_back();
 }
 
 $fn = 32;
