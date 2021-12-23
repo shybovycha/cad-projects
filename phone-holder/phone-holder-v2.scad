@@ -119,7 +119,7 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
 
-    module brim(length, height1, height2, depth, thickness, fillet = 2)
+    module brim(length, height1, height2, depth, thickness, fillet = 2, hole = 0)
     {
         difference()
         {
@@ -143,6 +143,13 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             // groove
             translate([ length / 2, thickness / 2, height1 - (thickness / 2) ])
                 prismoid(size1 = [ length * 1.25, thickness / 2 ], size2 = [ length * 1.25, thickness / 3 ], h = (thickness / 2) + PRINTER_SLOP, center = false);
+            
+            // hole
+            if (hole > 0)
+            {
+                translate([ length / 2, (depth + thickness + (depth / 2)) / 2, 0 ])
+                    cuboid([ hole, depth / 2, thickness * 2 + (2 * PRINTER_SLOP) ], fillet = fillet, edges = EDGE_FR_LF + EDGE_FR_RT + EDGE_BK_RT + EDGE_BK_LF);
+            }
         }
     }
 
@@ -158,13 +165,19 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         rotate([ 180, 0, 0 ])
             rack_driver_gear();
 
+    // bottom brim
     translate([ 0, -50, 0 ])
-        brim(length = closed_width, height1 = 30, height2 = 10, depth = 12.5, thickness = 5);
+        brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = case_thickness, hole = case_depth);
 
+    // side brim
     translate([ 0, 60, 0 ])
         //rotate([ 90, 0, 0 ])
             brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
-
+            
+    translate([ 0, 100, 0 ])
+        //rotate([ 90, 0, 0 ])
+            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+            
     translate([ 0, 30, 0 ])
         rotate([ 90, 0, 90 ])
             axis();
