@@ -239,43 +239,38 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
 
-    translate([ 56, 96, 2.5 ])
+    translate([ -40, 7, 0 ])
         top_rail();
 
-    translate([ 124, 104, 2.5 ])
-        rotate([ 0, 0, 180 ])
-            top_rail();
-        // bottom_rail();
+    translate([ -40, 23, 0 ])
+        top_rail();
 
-    translate([ 90, 100, 6 ])
+    translate([ 40, 0, 5 ])
         rotate([ 180, 0, 0 ])
             rack_driver_gear();
+    
+    translate([ -5, -13, 5 ])
+        rotate([ 0, 90, 0 ])
+            axis();
 
     // bottom brim
-    translate([ 130, 0, 0 ])
-        rotate([ 90, 0, 0 ])
-            rotate([ 0, 180, 0 ])
-                brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = case_thickness, hole = case_depth);
+    translate([ 100, 50, 5 ])
+        rotate([ 0, 0, 90 ])
+            brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = case_thickness, hole = case_depth);
 
     // side brim
-    translate([ 190, 100, 0 ])
-        rotate([ 90, 0, 0 ])
-            rotate([ 0, -90, 0 ])
-                brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+    translate([ 70, -18, 5 ])
+        rotate([ 0, 0, 90 ])
+            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ -10, 100, 0 ])
-        rotate([ 90, 0, 0 ])
-            rotate([ 0, 90, 0 ])
-                brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+    translate([ 100, 5, 5 ])
+        rotate([ 0, 0, 90 ])
+            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ 95 + rack_tooth_height / 2, 100, 13 ])
-        rotate([ 90, 0, 0 ])
-            axis();
-            
-    translate([ 50, 50, 0 ])
+    translate([ -90, 30, 0 ])
         case_front();
         
-    translate([ 50, 50, 50 ])
+    translate([ -5, 30, 0 ])
         case_back();
 }
 
