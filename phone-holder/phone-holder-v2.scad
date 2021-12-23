@@ -28,6 +28,8 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
     rack_driver_gear_thickness = rack_thickness;
 
     rack_driver_gear_outer_radius = outer_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_driver_gear_number_of_teeth);
+    
+    worm_wheel_outer_radius = outer_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = worm_wheel_number_of_teeth);
 
     rail_length = (rack_travel_distance * 2) + rail_non_teethed_length - rack_mm_per_tooth;
 
@@ -153,7 +155,7 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
     
-    module case_back(fillet = 4)
+    module case_front(fillet = 4)
     {
         difference()
         {
@@ -186,7 +188,7 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
                 {
                     union()
                     {
-                        translate([ (closed_width / 2) + rack_tooth_height * 0, 0, rack_thickness + (case_thickness / 2) ])
+                        translate([ (closed_width / 2) + rack_tooth_height / 2, 0, rack_thickness + (case_thickness / 2) ])
                             cube([ axis_radius * 2.5, case_thickness, axis_radius ], center = false);
                         
                         translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, case_thickness, rack_thickness + (case_thickness / 2) + axis_radius * (1 + PRINTER_SLOP * 2) ])
@@ -208,6 +210,32 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             
             translate([ -closed_width / 2, (back_holder_length / 2) - rack_driver_gear_outer_radius - (rail_height + rack_tooth_height), rack_thickness / 2 ])
                 cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
+        }
+    }
+    
+    module case_back(fillet = 4)
+    {
+        difference()
+        {
+            union()
+            {
+                cuboid([ closed_width, back_holder_length, (axis_radius * 2) + (case_thickness / 2) ], fillet = fillet, edges = EDGE_BK_LF + EDGE_BK_RT + EDGE_BOT_LF + EDGE_BOT_RT + EDGE_BOT_BK, center = false);
+                
+                translate([ closed_width / 2, -case_thickness / 2, (rack_thickness + (case_thickness / 2)) / 2 ])
+                    rotate([ -90, 0, 0 ])
+                        prismoid(size1 = [ closed_width, case_thickness / 2 ], size2 = [ closed_width, case_thickness / 3 ], h = case_thickness / 2, center = false);
+            }
+                
+            translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, back_holder_length + PRINTER_SLOP, rack_thickness - (case_thickness / 2) + axis_radius * 1.5 * (1 + PRINTER_SLOP * 2) ])
+                rotate([ 90, 0, 0 ])
+                    cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+
+            translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, case_thickness - PRINTER_SLOP, rack_thickness - (case_thickness / 2) + axis_radius * 1.5 * (1 + PRINTER_SLOP * 2) ])
+                rotate([ 90, 0, 0 ])
+                    cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+                    
+            translate([ closed_width / 2, (back_holder_length / 2), rack_thickness + worm_wheel_thickness / 2 ])
+                cylinder(r = worm_wheel_outer_radius + rack_tooth_height, h = worm_wheel_thickness + PRINTER_SLOP, center = false);
         }
     }
 
@@ -245,6 +273,9 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             axis();
             
     translate([ 50, 50, 0 ])
+        case_front();
+        
+    translate([ 50, 50, 50 ])
         case_back();
 }
 
