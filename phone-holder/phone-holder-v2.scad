@@ -55,9 +55,9 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         {
             union()
             {
-                translate([ -rail_non_teethed_length, -rail_height - rack_tooth_height / 2, 0 ])
+                translate([ -rail_non_teethed_length, -rail_height - rack_tooth_height / 2 - (PRINTER_SLOP * 1.5), 0 ])
                     // cube([ rack_travel_distance, rail_height - (rack_tooth_height * 2), rack_thickness ], center = false);
-                    cube([ rail_non_teethed_length, rail_height - rack_tooth_height, rack_driver_gear_thickness ], center = false);
+                    cube([ rail_non_teethed_length + rack_mm_per_tooth / 2, rail_height - rack_tooth_height, rack_driver_gear_thickness + (PRINTER_SLOP * 2) ], center = false);
 
                 translate([ rack_mm_per_tooth / 2, -rack_tooth_height, rack_thickness / 2 ])
                     rack(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_number_of_teeth, thickness = rack_driver_gear_thickness, height = rail_height, pressure_angle = 20);
@@ -269,9 +269,9 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             axis();
 
     // bottom brim
-    translate([ 30, 10, 9 ])
-        rotate([ 0, 0, 90 ])
-            brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = rack_thickness + (case_thickness / 2), hole = case_depth);
+    //translate([ 30, 10, 9 ])
+        //rotate([ 0, 0, 90 ])
+            //brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = rack_thickness + (case_thickness / 2), hole = case_depth);
 
     // side brim
     //translate([ 70, -18, 5 ])
