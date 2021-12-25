@@ -6,7 +6,7 @@ include <BOSL/constants.scad>;
 
 module phone_holder(closed_width, open_width, back_holder_length, case_thickness, case_depth, axis_radius, axis_length, side_brim_height1, side_brim_height2, bottom_brim_height1, bottom_brim_height2)
 {
-    rack_travel_distance = (open_width - closed_width) * 0.75;
+    rack_travel_distance = (open_width - closed_width) * 1.15;
     rack_length = (open_width / 2) + rack_travel_distance;
 
     rack_mm_per_tooth = 1.5;
@@ -17,25 +17,37 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
     rail_non_teethed_length = closed_width - rack_travel_distance;
     rail_height = case_depth;
 
-    rack_tooth_height = adendum(mm_per_tooth = rack_mm_per_tooth);
+    rack_tooth_height = adendum(mm_per_tooth = rack_mm_per_tooth) + dedendum(mm_per_tooth = rack_mm_per_tooth);
 
     // TODO: change
-    rack_driver_gear_number_of_teeth = 15;
+    rack_driver_gear_number_of_teeth = 32;
 
-    worm_wheel_number_of_teeth = rack_driver_gear_number_of_teeth / 2;
+    // TODO: make a param?
+    worm_wheel_number_of_teeth = 8;
+    
+    // TODO: make a param:
+    axis_thread_length = 10;
 
     worm_wheel_thickness = rack_thickness / 2;
-    rack_driver_gear_thickness = rack_thickness;
-
+    rack_driver_gear_thickness = rack_thickness - (PRINTER_SLOP * 4);
+    
     rack_driver_gear_outer_radius = outer_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_driver_gear_number_of_teeth);
     
     worm_wheel_outer_radius = outer_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = worm_wheel_number_of_teeth);
+    
+    worm_wheel_mm_per_tooth = rack_mm_per_tooth * 2;
+    
+    worm_wheel_tooth_height = adendum(mm_per_tooth = worm_wheel_mm_per_tooth) + dedendum(mm_per_tooth = worm_wheel_mm_per_tooth);
 
     rail_length = (rack_travel_distance * 2) + rail_non_teethed_length - rack_mm_per_tooth;
 
     groove_depth = rack_thickness / 3;
 
     axis_rod_length = axis_length + back_holder_length; // TODO: + case and mounts
+    
+    worm_wheel_pitch_radius = pitch_radius(mm_per_tooth = worm_wheel_mm_per_tooth, number_of_teeth = worm_wheel_number_of_teeth);
+    
+    rack_driver_gear_pitch_radius = pitch_radius(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_driver_gear_number_of_teeth);
 
     module top_rail()
     {
@@ -43,15 +55,15 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         {
             union()
             {
-                translate([ -rail_non_teethed_length, -rail_height, 0 ])
+                translate([ -rail_non_teethed_length, -rail_height - rack_tooth_height / 2, 0 ])
                     // cube([ rack_travel_distance, rail_height - (rack_tooth_height * 2), rack_thickness ], center = false);
-                    cube([ rail_non_teethed_length, rail_height - (rack_tooth_height * 2), rack_thickness ], center = false);
+                    cube([ rail_non_teethed_length, rail_height - rack_tooth_height, rack_driver_gear_thickness ], center = false);
 
                 translate([ rack_mm_per_tooth / 2, -rack_tooth_height, rack_thickness / 2 ])
-                    rack(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_number_of_teeth, thickness = rack_thickness, height = rail_height, pressure_angle = 20);
+                    rack(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_number_of_teeth, thickness = rack_driver_gear_thickness, height = rail_height, pressure_angle = 20);
 
-                translate([ rack_travel_distance - rack_mm_per_tooth, -rail_height, 0 ])
-                    cube([ rack_travel_distance, rail_height - (rack_tooth_height * 2), rack_thickness ], center = false);
+                // translate([ rack_travel_distance - rack_mm_per_tooth, -(rail_height + (rack_tooth_height / 2)), 0 ])
+                    // cube([ rack_travel_distance, rail_height - rack_tooth_height, rack_thickness ], center = false);
                 
                 // side brim mount
                 translate([ -rail_non_teethed_length - case_thickness / 2, -(rack_tooth_height * 2 + (rail_height - (rack_tooth_height * 2)) / 2), (case_thickness / 2) ])
@@ -101,23 +113,21 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
             gear(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = rack_driver_gear_number_of_teeth, thickness = rack_driver_gear_thickness, hole_diameter = 0);
 
             translate([ 0, 0, -(rack_driver_gear_thickness / 2 + worm_wheel_thickness / 2) ])
-                gear(mm_per_tooth = rack_mm_per_tooth, number_of_teeth = worm_wheel_number_of_teeth, thickness = worm_wheel_thickness, hole_diameter = 0);
+                gear(mm_per_tooth = worm_wheel_mm_per_tooth, number_of_teeth = worm_wheel_number_of_teeth, thickness = worm_wheel_thickness, hole_diameter = 0);
         }
     }
 
     module axis()
     {
-        thread_length = 10;
-
         union()
         {
-            translate([ 0, 0, thread_length / 2 ])
-                cylinder(r = axis_radius, h = (back_holder_length / 2) - (thread_length / 2), center = false);
+            translate([ 0, 0, axis_thread_length / 2 ])
+                cylinder(r = axis_radius, h = (back_holder_length / 2) - (axis_thread_length / 2), center = false);
 
-            trapezoidal_threaded_rod(d = axis_radius * 2, l = thread_length, pitch = circular_pitch(mm_per_tooth = rack_mm_per_tooth), thread_depth = rack_tooth_height * 2);
+            trapezoidal_threaded_rod(d = axis_radius * 2, l = axis_thread_length, pitch = circular_pitch(mm_per_tooth = worm_wheel_mm_per_tooth), thread_depth = worm_wheel_tooth_height);
 
             translate([ 0, 0, - ((back_holder_length / 2) + axis_length) ])
-                cylinder(r = axis_radius, h = (back_holder_length / 2) - (thread_length / 2) + axis_length, center = false);
+                cylinder(r = axis_radius, h = (back_holder_length / 2) - (axis_thread_length / 2) + axis_length, center = false);
         }
     }
 
@@ -165,50 +175,55 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
                 
                 translate([ closed_width / 2, -case_thickness / 2, (rack_thickness + (case_thickness / 2)) / 2 ])
                     rotate([ -90, 0, 0 ])
-                        prismoid(size1 = [ closed_width, case_thickness / 2 ], size2 = [ closed_width, case_thickness / 3 ], h = case_thickness / 2, center = false);
+                        prismoid(size1 = [ closed_width, (case_thickness / 2) - (PRINTER_SLOP * 2) ], size2 = [ closed_width, case_thickness / 3 ], h = case_thickness / 2, center = false);
                 
+                // top axis support
                 difference()
                 {
                     union()
                     {
-                        translate([ (closed_width / 2) + rack_tooth_height / 2, back_holder_length - (case_thickness), rack_thickness + (case_thickness / 2) ])
-                            cube([ axis_radius * 2.5, case_thickness, axis_radius ], center = false);
+                        translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), back_holder_length - (case_thickness / 2), rack_thickness + axis_radius ])
+                            cube([ (axis_radius * 2) + case_thickness, case_thickness, axis_radius + case_thickness / 2 ], center = true);
                         
-                        translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, back_holder_length, rack_thickness + (case_thickness / 2) + axis_radius * (1 + PRINTER_SLOP * 2) ])
+                        translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), back_holder_length  - (case_thickness / 2), rack_thickness + (case_thickness / 2) + axis_radius + (PRINTER_SLOP * 5) ])
                             rotate([ 90, 0, 0 ])
-                                cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+                                cylinder(r = axis_radius + (case_thickness / 2), h = case_thickness, center = true);
                     }
                     
-                    translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, back_holder_length + case_thickness / 2, rack_thickness + (case_thickness / 2) + axis_radius   * (1 + PRINTER_SLOP * 2)])
+                    translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), back_holder_length + case_thickness * 2, rack_thickness + (case_thickness / 2) + axis_radius + (PRINTER_SLOP * 5) ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 2, center = false);
+                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 4, center = false);
                 }
                 
+                // bottom axis support
                 difference()
                 {
                     union()
                     {
-                        translate([ (closed_width / 2) + rack_tooth_height / 2, 0, rack_thickness + (case_thickness / 2) ])
-                            cube([ axis_radius * 2.5, case_thickness, axis_radius ], center = false);
+                        translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), (case_thickness / 2), rack_thickness + axis_radius ])
+                            cube([ (axis_radius * 2) + case_thickness, case_thickness, axis_radius + case_thickness / 2 ], center = true);
                         
-                        translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25, case_thickness, rack_thickness + (case_thickness / 2) + axis_radius * (1 + PRINTER_SLOP * 2) ])
+                        translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), (case_thickness / 2), rack_thickness + (case_thickness / 2) + axis_radius + (PRINTER_SLOP * 5) ])
                             rotate([ 90, 0, 0 ])
-                                cylinder(r = axis_radius * 1.25, h = case_thickness, center = false);
+                                cylinder(r = axis_radius + (case_thickness / 2), h = case_thickness, center = true);
                     }
                     
-                    translate([ (closed_width / 2) + rack_tooth_height / 2 + axis_radius * 1.25,  case_thickness * 1.5, rack_thickness + (case_thickness / 2) + axis_radius   * (1 + PRINTER_SLOP * 2)])
+                    translate([ (closed_width / 2) + worm_wheel_pitch_radius + (axis_radius - worm_wheel_tooth_height / 2), case_thickness * 2, rack_thickness + (case_thickness / 2) + axis_radius + (PRINTER_SLOP * 5) ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 2, center = false);
+                        cylinder(r = axis_radius * (1 + PRINTER_SLOP), h = case_thickness * 4, center = false);
                 }
             }
             
-            translate([ -closed_width / 2, (back_holder_length / 2) + rack_driver_gear_outer_radius, rack_thickness / 2 ])
+            // top rail groove
+            translate([ -closed_width / 2, (back_holder_length / 2) + rack_driver_gear_pitch_radius - rack_tooth_height / 2, rack_thickness / 2 ])
                 cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
             
+            // drive gear groove
             translate([ closed_width / 2, (back_holder_length / 2), rack_thickness / 2 ])
                     cylinder(r = rack_driver_gear_outer_radius + rack_tooth_height, h = rack_driver_gear_thickness + PRINTER_SLOP, center = false);
             
-            translate([ -closed_width / 2, (back_holder_length / 2) - rack_driver_gear_outer_radius - (rail_height + rack_tooth_height), rack_thickness / 2 ])
+            // bottom rail groove
+            translate([ -closed_width / 2, (back_holder_length / 2) - rack_driver_gear_pitch_radius - (rail_height - rack_tooth_height / 2), rack_thickness / 2 ])
                 cube([ closed_width * 2.5, rail_height + rack_tooth_height, rack_thickness + PRINTER_SLOP ], center = false);
         }
     }
@@ -239,39 +254,51 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
 
-    translate([ -40, 7, 0 ])
+    translate([ -60, 7, 0 ])
         top_rail();
 
-    translate([ -40, 23, 0 ])
-        top_rail();
-
-    translate([ 40, 0, 5 ])
+    //translate([ -40, 23, 0 ])
+        //top_rail();
+    
+    translate([ 10, 0, 5 ])
         rotate([ 180, 0, 0 ])
             rack_driver_gear();
     
-    translate([ -5, -13, 5 ])
+    translate([ -5, -15, 5 ])
         rotate([ 0, 90, 0 ])
             axis();
 
     // bottom brim
-    translate([ 100, 50, 5 ])
+    translate([ 30, 10, 9 ])
         rotate([ 0, 0, 90 ])
-            brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = case_thickness, hole = case_depth);
+            brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = rack_thickness + (case_thickness / 2), hole = case_depth);
 
     // side brim
-    translate([ 70, -18, 5 ])
-        rotate([ 0, 0, 90 ])
-            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+    //translate([ 70, -18, 5 ])
+        //rotate([ 0, 0, 90 ])
+            //brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ 100, 5, 5 ])
-        rotate([ 0, 0, 90 ])
-            brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
+    //translate([ 100, 5, 5 ])
+        //rotate([ 0, 0, 90 ])
+            //brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ -90, 30, 0 ])
+    translate([ -85, 12, 0 ])
         case_front();
         
-    translate([ -5, 30, 0 ])
-        case_back();
+    //translate([ -5, 30, 0 ])
+        //case_back();
+        
+    // TODO: DEBUG INFO
+    /*translate([ -45, 62, 5 ])
+        rotate([ 180, 0, 0 ])
+            rack_driver_gear();
+            
+    translate([ -60, 55.7, 5 ])
+        top_rail();
+            
+    translate([ -38, 62, 13 ])
+        rotate([ 90, 0, 0 ])
+            axis();*/
 }
 
 $fn = 32;
