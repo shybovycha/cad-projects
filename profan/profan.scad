@@ -18,7 +18,13 @@ include <BOSL/involute_gears.scad>;
  * - https://www.engineersedge.com/gear_formula.htm
  */
 
-module profan()
+module profan(
+    num_of_planets = 2,
+    num_of_planet_gear_vents = 6,
+    
+    ring_gear_num_of_teeth = 96,
+    planet_gear_num_of_teeth = 42
+)
 {
     // critical dimensions:
     //   1. max outer diameter = 110 mm
@@ -81,12 +87,6 @@ module profan()
     case_mount_diameter = 4.3;
     
     // TODO: parametrize
-    num_of_planets = 2;
-    num_of_planet_gear_vents = 6;
-    
-    ring_gear_num_of_teeth = 96;
-    planet_gear_num_of_teeth = 42;
-    
     planet_gear_thickness = 2 * motor_mount_wall_thickness;
     ring_gear_thickness = 2 * motor_mount_wall_thickness;
     sun_gear_thickness = 2 * motor_mount_wall_thickness;
@@ -242,10 +242,20 @@ module profan()
             union()
             {
                 // main mount
-                cyl(
-                    d = main_mount_diameter,
-                    h = motor_mount_hole_depth + motor_mount_wall_thickness
-                );
+                // DEBUG
+                
+                if (DEBUG)
+                {
+                    cyl(
+                        d = sun_gear_axis_diameter,
+                        h = motor_mount_hole_depth + motor_mount_wall_thickness
+                    );
+                } else {
+                    cyl(
+                        d = main_mount_diameter,
+                        h = motor_mount_hole_depth + motor_mount_wall_thickness
+                    );
+                }
                     
                 // arms
                 translate([ 0, 0, ((motor_mount_hole_depth + motor_mount_wall_thickness) / 2) - (carrier_arm_thickness / 2) ])
@@ -288,11 +298,14 @@ module profan()
                     }
             }
             
-            translate([ 0, 0, -motor_mount_wall_thickness ])
-                cyl(
-                    d = motor_mount_hole_diameter,
-                    h = motor_mount_hole_depth
-                );
+            if (!DEBUG)
+            {
+                translate([ 0, 0, -motor_mount_wall_thickness ])
+                    cyl(
+                        d = motor_mount_hole_diameter,
+                        h = motor_mount_hole_depth
+                    );
+            }
             
             for (i = [ 1 : num_of_planets ])
             {
@@ -327,6 +340,7 @@ module profan()
         carrier();
 }
 
-$fn = 128;
+DEBUG = true;
+$fn = 256;
 
-profan();
+profan(num_of_planets = 3);
