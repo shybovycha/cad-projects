@@ -76,6 +76,8 @@ module profan()
     planet_gear_num_of_teeth = 42;
     
     planet_gear_thickness = 10;
+    ring_gear_thickness = 10;
+    sun_gear_thickness = 10;
     
     // calculated parameters
     ring_gear_module = ring_gear_pitch_diameter / ring_gear_num_of_teeth;
@@ -101,13 +103,54 @@ module profan()
     
     module sun_gear()
     {
+        // circular pitch
+        mm_per_tooth = (PI * sun_gear_pitch_diameter) / sun_gear_num_of_teeth;
+        
+        gear(
+            mm_per_tooth = mm_per_tooth,
+            number_of_teeth = sun_gear_num_of_teeth,
+            thickness = sun_gear_thickness,
+            hole_diameter = 0
+        );
     }
     
     module ring_gear()
     {
+        // circular pitch
+        mm_per_tooth = (PI * ring_gear_pitch_diameter) / ring_gear_num_of_teeth;
+        
+        difference()
+        {
+            // TODO: this should be cuboid to allow for mounting holes on top of a fan case
+            cyl(
+                d = ring_gear_pitch_diameter + ring_gear_thickness,
+                h = ring_gear_thickness
+            );
+            
+            gear(
+                mm_per_tooth = mm_per_tooth,
+                number_of_teeth = ring_gear_num_of_teeth,
+                thickness = ring_gear_thickness + (2 * PRINTER_SLOP),
+                hole_diameter = 0,
+                interior = true
+            );
+        }
     }
     
-    planet_gear();
+    ring_gear();
+    
+    translate([ -(ring_gear_pitch_diameter / 2) + (planet_gear_pitch_diameter / 2), 0, 0 ])
+        rotate([ 0, 0, 4 ])
+            planet_gear();
+    
+    translate([ (ring_gear_pitch_diameter / 2) - (planet_gear_pitch_diameter / 2), 0, 0 ])
+        rotate([ 0, 0, 4 ])
+            planet_gear();
+    
+    rotate([ 0, 0, 15 ])
+        sun_gear();
 }
+
+$fn = 128;
 
 profan();
