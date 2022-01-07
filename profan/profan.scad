@@ -82,13 +82,14 @@ module profan()
     
     // TODO: parametrize
     num_of_planets = 2;
+    num_of_planet_gear_vents = 6;
     
     ring_gear_num_of_teeth = 96;
     planet_gear_num_of_teeth = 42;
     
-    planet_gear_thickness = 10;
-    ring_gear_thickness = 10;
-    sun_gear_thickness = 10;
+    planet_gear_thickness = 2 * motor_mount_wall_thickness;
+    ring_gear_thickness = 2 * motor_mount_wall_thickness;
+    sun_gear_thickness = 2 * motor_mount_wall_thickness;
     
     sun_gear_axis_height = 7.5;
     
@@ -127,19 +128,34 @@ module profan()
     
     planet_gear_mm_per_tooth = (PI * planet_gear_pitch_diameter) / planet_gear_num_of_teeth;
     
+    planet_gear_vent_diameter = (planet_gear_pitch_diameter - planet_gear_axis_diameter - (4 * motor_mount_wall_thickness)) / 2;
+    
     module planet_gear()
     {
-        union()
+        difference()
         {
-            gear(
-                mm_per_tooth = planet_gear_mm_per_tooth,
-                number_of_teeth = planet_gear_num_of_teeth,
-                thickness = planet_gear_thickness,
-                hole_diameter = 0
-            );
+            union()
+            {
+                gear(
+                    mm_per_tooth = planet_gear_mm_per_tooth,
+                    number_of_teeth = planet_gear_num_of_teeth,
+                    thickness = planet_gear_thickness,
+                    hole_diameter = 0
+                );
+                
+                translate([ 0, 0, -(planet_gear_thickness / 2) - (planet_gear_axis_height / 2) ])
+                    cyl(d = planet_gear_axis_diameter - (PRINTER_SLOP * 2), h = planet_gear_axis_height);
+            }
             
-            translate([ 0, 0, -(planet_gear_thickness / 2) - (planet_gear_axis_height / 2) ])
-                cyl(d = planet_gear_axis_diameter - (PRINTER_SLOP * 2), h = planet_gear_axis_height);
+            for (i = [ 1 : num_of_planet_gear_vents ])
+            {
+                a = (360 / num_of_planet_gear_vents) * i;
+                r = (planet_gear_axis_diameter / 2) + (planet_gear_vent_diameter / 2) + motor_mount_wall_thickness;
+                
+                translate([ cos(a) * r, sin(a) * r, 0 ])
+                    rotate([ 0, 0, a ])
+                        cyl(d = planet_gear_vent_diameter, h = planet_gear_thickness + (2 * PRINTER_SLOP));
+            }
         }
     }
     
@@ -222,14 +238,15 @@ module profan()
                     }
                 }
                 
-                translate([ 0, 0, (sun_gear_thickness / 2) + (sun_gear_mount_height / 2) + (sun_gear_axis_height / 2) ])
-                difference()
-                {
-                    cyl(d = sun_gear_axis_diameter + (2 * motor_mount_wall_thickness), h = sun_gear_axis_height / 2);
-                    
-                    translate([ 0, 0, motor_mount_wall_thickness ])
-                        cyl(d = sun_gear_axis_diameter, h = sun_gear_axis_height / 2);
-                }
+                // sun gear holder pad
+                translate([ 0, 0, ((motor_mount_hole_depth + motor_mount_wall_thickness) / 2) + (sun_gear_axis_height / 4) ])
+                    difference()
+                    {
+                        cyl(d = sun_gear_axis_diameter + (2 * motor_mount_wall_thickness), h = sun_gear_axis_height / 2);
+                        
+                        translate([ 0, 0, 0 ])
+                            cyl(d = sun_gear_axis_diameter, h = (sun_gear_axis_height / 2) + motor_mount_wall_thickness);
+                    }
             }
             
             translate([ 0, 0, -motor_mount_wall_thickness ])
@@ -261,7 +278,7 @@ module profan()
     rotate([ 0, 0, 15 ])
         sun_gear();
     
-    translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth ])
+    translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
         carrier();
 }
 
