@@ -69,7 +69,12 @@ module profan()
     
     // IMPORTANT: all gears' modules must be equal
     
+    // constants
+    case_size = 120;
+    
     ring_gear_pitch_diameter = 110;
+    
+    case_mount_diameter = 4.3;
     
     // TODO: parametrize
     num_of_planets = 2;
@@ -124,10 +129,12 @@ module profan()
         difference()
         {
             // TODO: this should be cuboid to allow for mounting holes on top of a fan case
-            cyl(
-                d = ring_gear_pitch_diameter + ring_gear_thickness,
-                h = ring_gear_thickness
-            );
+            //cyl(
+            //    d = ring_gear_pitch_diameter + ring_gear_thickness,
+            //    h = ring_gear_thickness
+            //);
+            
+            cuboid(size = [ case_size, case_size, ring_gear_thickness ], center = true, edges = EDGE_BK_LF + EDGE_BK_RT + EDGE_FR_LF + EDGE_FR_RT, fillet = 5);
             
             gear(
                 mm_per_tooth = mm_per_tooth,
@@ -136,6 +143,19 @@ module profan()
                 hole_diameter = 0,
                 interior = true
             );
+            
+            // mounting holes
+            translate([ -(case_size / 2) + (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
+                cyl(d = case_mount_diameter, h = ring_gear_thickness + (2 * PRINTER_SLOP));
+            
+            translate([ -(case_size / 2) + (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
+                cyl(d = case_mount_diameter, h = ring_gear_thickness + (2 * PRINTER_SLOP));
+                
+            translate([ (case_size / 2) - (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
+            cyl(d = case_mount_diameter, h = ring_gear_thickness + (2 * PRINTER_SLOP));
+        
+        translate([ (case_size / 2) - (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
+            cyl(d = case_mount_diameter, h = ring_gear_thickness + (2 * PRINTER_SLOP));
         }
     }
     
