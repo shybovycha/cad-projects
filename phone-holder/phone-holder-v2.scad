@@ -254,24 +254,24 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         }
     }
 
-    translate([ -60, 7, 0 ])
-        top_rail();
+    //translate([ -60, 7, 0 ])
+        //top_rail();
 
     //translate([ -40, 23, 0 ])
         //top_rail();
     
-    translate([ 10, 0, 5 ])
-        rotate([ 180, 0, 0 ])
-            rack_driver_gear();
+    //translate([ 10, 0, 5 ])
+        //rotate([ 180, 0, 0 ])
+            //rack_driver_gear();
     
-    translate([ -5, -15, 5 ])
-        rotate([ 0, 90, 0 ])
-            axis();
+    //translate([ -5, -15, 5 ])
+        //rotate([ 0, 90, 0 ])
+            //axis();
 
     // bottom brim
-    //translate([ 30, 10, 9 ])
-        //rotate([ 0, 0, 90 ])
-            //brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = rack_thickness + (case_thickness / 2), hole = case_depth);
+    translate([ 30, 10, 9 ])
+        rotate([ 0, 0, 90 ])
+            brim(length = closed_width, height1 = bottom_brim_height1, height2 = bottom_brim_height2, depth = case_depth, thickness = rack_thickness + (case_thickness / 2), hole = case_depth);
 
     // side brim
     //translate([ 70, -18, 5 ])
@@ -282,8 +282,8 @@ module phone_holder(closed_width, open_width, back_holder_length, case_thickness
         //rotate([ 0, 0, 90 ])
             //brim(length = closed_width / 2, height1 = side_brim_height1, height2 = side_brim_height2, depth = case_depth, thickness = case_thickness);
             
-    translate([ -85, 12, 0 ])
-        case_front();
+    //translate([ -85, 12, 0 ])
+        //case_front();
         
     //translate([ -5, 30, 0 ])
         //case_back();
