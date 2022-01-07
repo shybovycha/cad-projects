@@ -72,6 +72,8 @@ module profan()
     ring_gear_pitch_diameter = 110;
     
     // TODO: parametrize
+    num_of_planets = 2;
+    
     ring_gear_num_of_teeth = 96;
     planet_gear_num_of_teeth = 42;
     
@@ -139,13 +141,15 @@ module profan()
     
     ring_gear();
     
-    translate([ -(ring_gear_pitch_diameter / 2) + (planet_gear_pitch_diameter / 2), 0, 0 ])
-        rotate([ 0, 0, 4 ])
-            planet_gear();
-    
-    translate([ (ring_gear_pitch_diameter / 2) - (planet_gear_pitch_diameter / 2), 0, 0 ])
-        rotate([ 0, 0, 4 ])
-            planet_gear();
+    for (i = [ 1 : num_of_planets ])
+    {
+        a = (360 / num_of_planets) * i;
+        r = (ring_gear_pitch_diameter / 2) - (planet_gear_pitch_diameter / 2);
+        
+        translate([ cos(a) * r, sin(a) * r, 0 ])
+            rotate([ 0, 0, 4 ])
+                planet_gear();
+    }
     
     rotate([ 0, 0, 15 ])
         sun_gear();
