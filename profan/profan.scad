@@ -321,26 +321,46 @@ module profan(
     }
     
     // assemble everything together
-    ring_gear();
     
-    for (i = [ 1 : num_of_planets ])
+    if (!DEBUG)
     {
-        a = (360 / num_of_planets) * i;
-        r = (ring_gear_pitch_diameter / 2) - (planet_gear_pitch_diameter / 2);
+        ring_gear();
         
-        translate([ cos(a) * r, sin(a) * r, 0 ])
-            rotate([ 0, 0, 4 ])
-                planet_gear();
+        for (i = [ 1 : num_of_planets ])
+        {
+            a = (360 / num_of_planets) * i;
+            r = (ring_gear_pitch_diameter / 2) - (planet_gear_pitch_diameter / 2);
+            
+            translate([ cos(a) * r, sin(a) * r, 0 ])
+                rotate([ 0, 0, 4 ])
+                    planet_gear();
+        }
+        
+        rotate([ 0, 0, 15 ])
+            sun_gear();
+        
+        translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
+            carrier();
+    } else {
+        ring_gear();
+        
+        for (i = [ 0 : num_of_planets - 1 ])
+        {
+            translate([ planet_gear_pitch_diameter * 1.2 * (i - 1), ring_gear_pitch_diameter * 0.85, 0 ])
+                rotate([ 180, 0, 0 ])
+                    planet_gear();
+        }
+        
+        translate([ ring_gear_pitch_diameter / 5, -ring_gear_pitch_diameter / 3.5, sun_gear_axis_height ])
+            sun_gear();
+        
+        translate([ 0, 0, ring_gear_thickness + sun_gear_mount_height + (motor_mount_wall_thickness * 1.5) ])
+            rotate([ 180, 0, 0 ])
+                carrier();
     }
-    
-    rotate([ 0, 0, 15 ])
-        sun_gear();
-    
-    translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
-        carrier();
 }
 
-DEBUG = true;
-$fn = 256;
+DEBUG = false;
+$fn = 64;
 
 profan(num_of_planets = 3);
