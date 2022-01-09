@@ -1,5 +1,6 @@
-include <BOSL/shapes.scad>;
-include <BOSL/involute_gears.scad>;
+include <BOSL2/shapes3d.scad>;
+include <BOSL2/gears.scad>;
+include <bladegen/bladegen.scad>;
 
 /*
  * ProFan
@@ -110,7 +111,7 @@ module profan(
     // circular pitch
     sun_gear_mm_per_tooth = ((PI * (sun_gear_pitch_diameter  - (PRINTER_SLOP * 4))) / sun_gear_num_of_teeth);
     
-    sun_gear_root_diameter = root_radius(mm_per_tooth = sun_gear_mm_per_tooth, number_of_teeth = sun_gear_num_of_teeth) * 1.5;
+    sun_gear_root_diameter = root_radius(pitch = sun_gear_mm_per_tooth, teeth = sun_gear_num_of_teeth) * 1.5;
     
     // TODO: figure better value?
     sun_gear_mount_height = sun_gear_axis_height / 4;
@@ -136,11 +137,12 @@ module profan(
         {
             union()
             {
-                gear(
-                    mm_per_tooth = planet_gear_mm_per_tooth,
-                    number_of_teeth = planet_gear_num_of_teeth,
-                    thickness = planet_gear_thickness,
-                    hole_diameter = 0
+                spur_gear(
+                    // mm_per_tooth = planet_gear_mm_per_tooth,
+                    mod = ring_gear_module,
+                    teeth = planet_gear_num_of_teeth,
+                    thickness = planet_gear_thickness
+                    //hole_diameter = 0
                 );
                 
                 translate([ 0, 0, -(planet_gear_thickness / 2) - (planet_gear_axis_height / 2) ])
@@ -169,11 +171,12 @@ module profan(
     {
         union()
         {
-            gear(
-                mm_per_tooth = sun_gear_mm_per_tooth,
-                number_of_teeth = sun_gear_num_of_teeth,
-                thickness = sun_gear_thickness,
-                hole_diameter = 0
+            spur_gear(
+                // mm_per_tooth = sun_gear_mm_per_tooth,
+                mod = ring_gear_module,
+                teeth = sun_gear_num_of_teeth,
+                thickness = sun_gear_thickness
+                //hole_diameter = 0
             );
             
             // axis
@@ -203,15 +206,17 @@ module profan(
         {
             cuboid(
                 size = [ case_size, case_size, ring_gear_thickness ],
-                center = true,
-                edges = EDGE_BK_LF + EDGE_BK_RT + EDGE_FR_LF + EDGE_FR_RT, fillet = 5
+                anchor = CENTER,
+                edges = [FWD + LEFT, BACK + LEFT, FWD + RIGHT, BACK + RIGHT],
+                rounding = 5
             );
             
-            gear(
-                mm_per_tooth = ring_gear_mm_per_tooth,
-                number_of_teeth = ring_gear_num_of_teeth,
+            spur_gear(
+                mod = ring_gear_module,
+                // mm_per_tooth = ring_gear_mm_per_tooth,
+                teeth = ring_gear_num_of_teeth,
                 thickness = ring_gear_thickness + (2 * PRINTER_SLOP),
-                hole_diameter = 0,
+                //hole_diameter = 0,
                 interior = true
             );
             
@@ -271,12 +276,12 @@ module profan(
                     {
                         a = (360 / num_of_planets) * i;
                         
-                        rotate([ 0, 0, a ])
+                        rotate([ 90, 0, a ])
                             prismoid(
                                 size1 = [ main_mount_diameter, carrier_arm_thickness ],
                                 size2 = [ planet_gear_mount_pad_diameter, carrier_arm_thickness ],
                                 h = carrier_arm_length,
-                                orient = ORIENT_X
+                                orient = RIGHT
                             );
                         
                         translate([ cos(a) * carrier_arm_length, sin(a) * carrier_arm_length, 0 ])
@@ -347,7 +352,7 @@ module profan(
                                 rotate([ 0, 0, a ])
                                     cuboid(
                                         size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), ring_gear_thickness ],
-                                        center = true
+                                        anchor = CENTER
                                     );
                             
                             // mounting hole
@@ -355,7 +360,7 @@ module profan(
                                 cyl(
                                     d = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
                                     h = ring_gear_thickness,
-                                    center = true
+                                    anchor = CENTER
                                 );
                         }
                             
@@ -363,7 +368,7 @@ module profan(
                             cyl(
                                 d = case_mount_diameter + (PRINTER_SLOP * 2),
                                 h = ring_gear_thickness + (PRINTER_SLOP * 2),
-                                center = true
+                                anchor = CENTER
                             );
                     }
                 }
@@ -450,8 +455,8 @@ module profan(
         rotate([ 0, 0, 15 ])
             sun_gear();
         
-        // translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
-            // carrier();
+        translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
+            carrier();
         
         translate([ 0, 0, ring_gear_thickness + (PRINTER_SLOP * 4) ])
             top_holder();
@@ -475,6 +480,9 @@ module profan(
 }
 
 DEBUG = false;
+
+$slop = 0.15;
+PRINTER_SLOP = $slop;
 $fn = 64;
 
 profan(num_of_planets = 3);
