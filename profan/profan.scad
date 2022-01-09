@@ -91,7 +91,7 @@ module profan(
     ring_gear_thickness = 2 * motor_mount_wall_thickness;
     sun_gear_thickness = 2 * motor_mount_wall_thickness;
     
-    sun_gear_axis_height = 7.5;
+    sun_gear_axis_height = 5;
     
     // calculated parameters
     ring_gear_module = ring_gear_pitch_diameter / ring_gear_num_of_teeth;
@@ -100,7 +100,7 @@ module profan(
     
     sun_gear_num_of_teeth = ring_gear_num_of_teeth - (2 * planet_gear_num_of_teeth);
     
-    sun_gear_pitch_diameter = ring_gear_module * sun_gear_num_of_teeth;
+    sun_gear_pitch_diameter = (ring_gear_module * sun_gear_num_of_teeth);
     
     // TODO: figure better values?
     planet_gear_mount_pad_diameter = planet_gear_pitch_diameter / 2;
@@ -108,7 +108,7 @@ module profan(
     planet_gear_axis_height = 10;
     
     // circular pitch
-    sun_gear_mm_per_tooth = (PI * sun_gear_pitch_diameter) / sun_gear_num_of_teeth;
+    sun_gear_mm_per_tooth = ((PI * (sun_gear_pitch_diameter  - (PRINTER_SLOP * 4))) / sun_gear_num_of_teeth);
     
     sun_gear_root_diameter = root_radius(mm_per_tooth = sun_gear_mm_per_tooth, number_of_teeth = sun_gear_num_of_teeth) * 1.5;
     
@@ -118,7 +118,7 @@ module profan(
     // TODO: figure better value?
     sun_gear_axis_diameter = sun_gear_root_diameter;
     
-    ring_gear_mm_per_tooth = (PI * ring_gear_pitch_diameter) / ring_gear_num_of_teeth;
+    ring_gear_mm_per_tooth = (PI * (ring_gear_pitch_diameter + (PRINTER_SLOP * 4))) / ring_gear_num_of_teeth;
     
     main_mount_diameter = motor_mount_hole_diameter + (2 * motor_mount_wall_thickness);
         
@@ -177,10 +177,17 @@ module profan(
             );
             
             // axis
-            cyl(
-                d = sun_gear_axis_diameter,
-                h = sun_gear_thickness + (2 * sun_gear_axis_height) - (2 * PRINTER_SLOP)
-            );
+            translate([ 0, 0, (sun_gear_thickness / 2) + (sun_gear_axis_height / 2) ])
+                cyl(
+                    d = sun_gear_axis_diameter,
+                    h = sun_gear_axis_height - (2 * PRINTER_SLOP)
+                );
+            
+            translate([ 0, 0, -((sun_gear_thickness / 2) + (sun_gear_axis_height / 2)) ])
+                cyl(
+                    d = sun_gear_axis_diameter,
+                    h = sun_gear_axis_height - (2 * PRINTER_SLOP)
+                );
             
             // mount for propeller
             // cyl(
@@ -339,8 +346,8 @@ module profan(
         rotate([ 0, 0, 15 ])
             sun_gear();
         
-        translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
-            carrier();
+        // translate([ 0, 0, -ring_gear_thickness - motor_mount_hole_depth - (motor_mount_wall_thickness * 2) ])
+            // carrier();
     } else {
         ring_gear();
         
