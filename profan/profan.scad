@@ -13,6 +13,7 @@ include <bladegen/bladegen.scad>;
  *
  * The idea is to use airplane-like propellers and utilize planetary gears to spin the main propeller as fast as possible for the best performance.
  *
+ * The project uses BOSL2 ( https://github.com/revarbat/BOSL2 ) and bladegen ( https://github.com/tallakt/bladegen ) libraries.
  *
  * References:
  * - https://woodgears.ca/gear/planetary.html
@@ -485,4 +486,11 @@ $slop = 0.15;
 PRINTER_SLOP = $slop;
 $fn = 64;
 
-profan(num_of_planets = 3);
+//profan(num_of_planets = 3);
+
+INCH_MM = 25.6;
+
+translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
+translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
+translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
+translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
