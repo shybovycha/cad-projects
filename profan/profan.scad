@@ -23,6 +23,8 @@ include <bladegen/bladegen.scad>;
 module profan(
     num_of_planets = 2,
     num_of_planet_gear_vents = 6,
+    
+    num_of_propellers = 3,
 
     ring_gear_num_of_teeth = 96,
     planet_gear_num_of_teeth = 42
@@ -97,7 +99,13 @@ module profan(
     holder_thickness = 5;
 
     sun_gear_axis_height = 5;
-
+    
+    propeller_joint_thickness = 7.5;
+    
+    propeller_mount_module = 1;
+    propeller_mount_thickness = 3;
+    propeller_mount_num_of_teeth = 8;
+    
     // calculated parameters
     ring_gear_module = ring_gear_pitch_diameter / ring_gear_num_of_teeth;
 
@@ -134,6 +142,10 @@ module profan(
     planet_gear_mm_per_tooth = (PI * planet_gear_pitch_diameter) / planet_gear_num_of_teeth;
 
     planet_gear_vent_diameter = (planet_gear_pitch_diameter - planet_gear_axis_diameter - (4 * motor_mount_wall_thickness)) / 2;
+    
+    main_propeller_mount_diameter = sun_gear_pitch_diameter + (propeller_joint_thickness * 2);
+    main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (6 * motor_mount_wall_thickness);
+
 
     module planet_gear()
     {
@@ -197,16 +209,26 @@ module profan(
                 );
 
             // mount for propeller
-            // cyl(
-            //     d = main_propeller_mount_diameter,
-            //     h = main_propeller_mount_height
-            // );
-
-            // propeller blades
-            // translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
-            // translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
-            // translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
-            // translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
+            difference()
+            {
+                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2)])
+                    cyl(
+                        d1 = main_propeller_mount_diameter,
+                        d2 = main_propeller_mount_diameter * 0.75,
+                        h = main_propeller_mount_thickness,
+                        rounding2 = 5
+                    );
+                
+                for (i = [ 0 : num_of_propellers ])
+                {
+                    a = (360 / num_of_propellers) * i;
+                    r = (main_propeller_mount_diameter / 2) - (propeller_mount_thickness / 2);
+                    
+                    translate([ cos(a) * r, sin(a) * r, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) ])
+                        rotate([ 90, 0, 90 + a ])
+                            spur_gear(mod = propeller_mount_module, teeth = propeller_mount_num_of_teeth, thickness = propeller_mount_thickness + (PRINTER_SLOP * 2));
+                }
+            }
         }
     }
 
@@ -467,6 +489,17 @@ module profan(
             }
         }
     }
+    
+    module propeller()
+    {
+        // propeller blades
+        // translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
+        // translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
+        // translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
+        // translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
+        
+        // spur_gear(mod = propeller_mount_module, teeth = propeller_mount_num_of_teeth, thickness = propeller_mount_thickness);
+    }
 
     // assemble everything together
 
@@ -510,7 +543,7 @@ module profan(
 
         if (HAS_SUN)
         {
-            translate([ ring_gear_pitch_diameter / 5, -ring_gear_pitch_diameter / 3.5, sun_gear_axis_height ])
+            // translate([ ring_gear_pitch_diameter / 5, -ring_gear_pitch_diameter / 3.5, sun_gear_axis_height ])
                 sun_gear();
         }
 
@@ -537,10 +570,10 @@ module profan(
 
 HAS_RING = false;
 HAS_PLANETS = false;
-HAS_SUN = false;
+HAS_SUN = true;
 HAS_CARRIER = false;
 HAS_TOP_HOLDER = false;
-HAS_BOTTOM_HOLDER = true;
+HAS_BOTTOM_HOLDER = false;
 
 DEBUG = true;
 
@@ -548,4 +581,4 @@ $slop = 0.15;
 PRINTER_SLOP = $slop;
 $fn = 64;
 
-profan(num_of_planets = 3);
+profan(num_of_planets = 3, num_of_propellers = 3);
