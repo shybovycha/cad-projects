@@ -88,9 +88,11 @@ module profan(
     
     case_mount_diameter = 4.3;
     
+    INCH_MM = 25.6;
+    
     // TODO: parametrize
     planet_gear_thickness = 2 * motor_mount_wall_thickness;
-    ring_gear_thickness = 2 * motor_mount_wall_thickness;
+    ring_gear_thickness = 10;
     sun_gear_thickness = 2 * motor_mount_wall_thickness;
     
     sun_gear_axis_height = 5;
@@ -198,6 +200,12 @@ module profan(
             //     d = main_propeller_mount_diameter,
             //     h = main_propeller_mount_height
             // );
+            
+            // propeller blades
+            // translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
+            // translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
+            // translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
+            // translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
         }
     }
     
@@ -352,7 +360,7 @@ module profan(
                             translate([ cos(a) * (r / 2), sin(a) * (r / 2), 0 ])
                                 rotate([ 0, 0, a ])
                                     cuboid(
-                                        size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), ring_gear_thickness ],
+                                        size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), (2 * motor_mount_wall_thickness) ],
                                         anchor = CENTER
                                     );
                             
@@ -360,7 +368,7 @@ module profan(
                             translate([ cos(a) * r, sin(a) * r, 0 ])
                                 cyl(
                                     d = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
-                                    h = ring_gear_thickness,
+                                    h = (2 * motor_mount_wall_thickness),
                                     anchor = CENTER
                                 );
                         }
@@ -368,7 +376,7 @@ module profan(
                         translate([ cos(a) * r, sin(a) * r, 0 ])
                             cyl(
                                 d = case_mount_diameter + (PRINTER_SLOP * 2),
-                                h = ring_gear_thickness + (PRINTER_SLOP * 2),
+                                h = (2 * motor_mount_wall_thickness) + (PRINTER_SLOP * 2),
                                 anchor = CENTER
                             );
                     }
@@ -379,12 +387,12 @@ module profan(
                 {
                     cyl(
                         d = (sun_gear_pitch_diameter + planet_gear_pitch_diameter + planet_gear_axis_diameter) + (motor_mount_wall_thickness * 2),
-                        h = ring_gear_thickness
+                        h = (2 * motor_mount_wall_thickness)
                     );
                     
                     cyl(
                         d = (sun_gear_pitch_diameter + planet_gear_pitch_diameter - planet_gear_axis_diameter - motor_mount_wall_thickness),
-                        h = ring_gear_thickness + (PRINTER_SLOP * 2)
+                        h = (2 * motor_mount_wall_thickness) + (PRINTER_SLOP * 2)
                     );
                 }
             }
@@ -462,23 +470,47 @@ module profan(
         translate([ 0, 0, ring_gear_thickness + (PRINTER_SLOP * 4) ])
             top_holder();
     } else {
-        ring_gear();
-        
-        for (i = [ 0 : num_of_planets - 1 ])
+        if (HAS_RING)
         {
-            translate([ planet_gear_pitch_diameter * 1.2 * (i - 1), ring_gear_pitch_diameter * 0.85, 0 ])
-                rotate([ 180, 0, 0 ])
-                    planet_gear();
+            ring_gear();
         }
         
-        translate([ ring_gear_pitch_diameter / 5, -ring_gear_pitch_diameter / 3.5, sun_gear_axis_height ])
-            sun_gear();
+        if (HAS_PLANETS)
+        {
+            for (i = [ 0 : num_of_planets - 1 ])
+            {
+                translate([ planet_gear_pitch_diameter * 1.2 * (i - 1), ring_gear_pitch_diameter * 0.85, 0 ])
+                    rotate([ 180, 0, 0 ])
+                        planet_gear();
+            }
+        }
         
-        translate([ 0, 0, ring_gear_thickness + sun_gear_mount_height + (motor_mount_wall_thickness * 1.5) ])
-            rotate([ 180, 0, 0 ])
-                carrier();
+        if (HAS_SUN)
+        {
+            translate([ ring_gear_pitch_diameter / 5, -ring_gear_pitch_diameter / 3.5, sun_gear_axis_height ])
+                sun_gear();
+        }
+        
+        if (HAS_CARRIER)
+        {
+            translate([ 0, 0, ring_gear_thickness + sun_gear_mount_height + (motor_mount_wall_thickness * 1.5) ])
+                rotate([ 180, 0, 0 ])
+                    carrier();
+        }
+
+        if (HAS_TOP_HOLDER)
+        {
+            translate([ 0, 0, ring_gear_thickness / 2 ])
+                top_holder();
+        }
     }
 }
+
+HAS_RING = true;
+HAS_PLANETS = true;
+HAS_SUN = true;
+HAS_CARRIER = true;
+HAS_TOP_HOLDER = true;
 
 DEBUG = false;
 
@@ -486,11 +518,4 @@ $slop = 0.15;
 PRINTER_SLOP = $slop;
 $fn = 64;
 
-//profan(num_of_planets = 3);
-
-INCH_MM = 25.6;
-
-translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
-translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
-translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
-translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
+profan(num_of_planets = 3);
