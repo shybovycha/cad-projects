@@ -145,7 +145,14 @@ module profan(
     
     main_propeller_mount_diameter = sun_gear_pitch_diameter + (propeller_joint_thickness * 2);
     main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (6 * motor_mount_wall_thickness);
-
+    
+    ring_gear_brim_width = (adendum(mod = ring_gear_module) + dedendum(mod = ring_gear_module)) * 2;
+    
+    main_propeller_mount_diameter_base = main_propeller_mount_diameter;
+    main_propeller_mount_diameter_top = main_propeller_mount_diameter * 0.75;
+    
+    propeller_mount_groove_offset_z = 0.9;
+    propeller_mount_groove_radius = lerp(main_propeller_mount_diameter_base, main_propeller_mount_diameter_top, 1 - propeller_mount_groove_offset_z) / 2;
 
     module planet_gear()
     {
@@ -214,69 +221,143 @@ module profan(
             {
                 translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2)])
                     cyl(
-                        d1 = main_propeller_mount_diameter,
-                        d2 = main_propeller_mount_diameter * 0.75,
+                        d1 = main_propeller_mount_diameter_base,
+                        d2 = main_propeller_mount_diameter_top,
                         h = main_propeller_mount_thickness,
-                        rounding2 = 5
+                        rounding2 = 10
                     );
                 
                 for (i = [ 0 : num_of_propellers ])
                 {
                     a = (360 / num_of_propellers) * i;
-                    r = (main_propeller_mount_diameter / 2) - (propeller_mount_thickness / 2);
+                    r = (main_propeller_mount_diameter / 2) - (propeller_mount_thickness);
                     
                     translate([ cos(a) * r, sin(a) * r, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) ])
                         rotate([ 90, 0, 90 + a ])
                             spur_gear(mod = propeller_mount_module, teeth = propeller_mount_num_of_teeth, thickness = propeller_mount_thickness + (PRINTER_SLOP * 2));
                 }
+                
+                // groove
+                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness * (1 - propeller_mount_groove_offset_z)) ])
+                    torus(
+                        r_maj = propeller_mount_groove_radius,
+                        r_min = (motor_mount_wall_thickness / 2) + (2 * PRINTER_SLOP)
+                    );
             }
         }
     }
 
     module ring_gear()
     {
-        difference()
+        union()
         {
-            cuboid(
-                size = [ case_size, case_size, ring_gear_thickness ],
-                anchor = CENTER,
-                edges = [FWD + LEFT, BACK + LEFT, FWD + RIGHT, BACK + RIGHT],
-                rounding = 5
-            );
+            difference()
+            {
+                cuboid(
+                    size = [ case_size, case_size, ring_gear_thickness ],
+                    anchor = CENTER,
+                    edges = [FWD + LEFT, BACK + LEFT, FWD + RIGHT, BACK + RIGHT],
+                    rounding = 5
+                );
 
-            spur_gear(
-                mod = ring_gear_module,
-                // mm_per_tooth = ring_gear_mm_per_tooth,
-                teeth = ring_gear_num_of_teeth,
-                thickness = ring_gear_thickness + (2 * PRINTER_SLOP),
-                //hole_diameter = 0,
-                interior = true
-            );
+                spur_gear(
+                    mod = ring_gear_module,
+                    // mm_per_tooth = ring_gear_mm_per_tooth,
+                    teeth = ring_gear_num_of_teeth,
+                    thickness = ring_gear_thickness + (2 * PRINTER_SLOP),
+                    //hole_diameter = 0,
+                    interior = true
+                );
 
-            // mounting holes
-            translate([ -(case_size / 2) + (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
+                // mounting holes
+                translate([ -(case_size / 2) + (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
+                    cyl(
+                        d = case_mount_diameter,
+                        h = ring_gear_thickness + (2 * PRINTER_SLOP)
+                    );
+
+                translate([ -(case_size / 2) + (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
+                    cyl(
+                        d = case_mount_diameter,
+                        h = ring_gear_thickness + (2 * PRINTER_SLOP)
+                    );
+
+                translate([ (case_size / 2) - (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
                 cyl(
                     d = case_mount_diameter,
                     h = ring_gear_thickness + (2 * PRINTER_SLOP)
                 );
 
-            translate([ -(case_size / 2) + (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
+            translate([ (case_size / 2) - (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
                 cyl(
                     d = case_mount_diameter,
                     h = ring_gear_thickness + (2 * PRINTER_SLOP)
                 );
+            }
+            
+            // brim
+            difference()
+            {
+                translate([ 0, 0, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                    cyl(
+                        d = outer_radius(mod = ring_gear_module, teeth = ring_gear_num_of_teeth, interior = true) * 2,
+                        h = motor_mount_wall_thickness,
+                        anchor = CENTER
+                    );
+                
+                translate([ 0, 0, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                    cyl(
+                        r = root_radius(mod = ring_gear_module, teeth = ring_gear_num_of_teeth, interior = true) - ring_gear_brim_width,
+                        h = motor_mount_wall_thickness + (2 * PRINTER_SLOP),
+                        anchor = CENTER
+                    );
+            }
+            
+            // propeller mount support
+            difference()
+            {
+                union()
+                {
+                    for (i = [ 0 : 4 ])
+                    {
+                        a = 45 + (90 * i);
+                        r = sqrt(pow(case_size / 2, 2) + pow(case_size / 2, 2)) - (case_mount_diameter + (motor_mount_wall_thickness * 3)) / 2 - case_mount_diameter;
 
-            translate([ (case_size / 2) - (case_mount_diameter), -(case_size / 2) + (case_mount_diameter), 0 ])
-            cyl(
-                d = case_mount_diameter,
-                h = ring_gear_thickness + (2 * PRINTER_SLOP)
-            );
-
-        translate([ (case_size / 2) - (case_mount_diameter), (case_size / 2) - (case_mount_diameter), 0 ])
-            cyl(
-                d = case_mount_diameter,
-                h = ring_gear_thickness + (2 * PRINTER_SLOP)
-            );
+                        // arm
+                        translate([ cos(a) * (r / 2), sin(a) * (r / 2), (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                            rotate([ 0, 0, a ])
+                                cuboid(
+                                    size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), motor_mount_wall_thickness ],
+                                    anchor = CENTER
+                                );
+                    }
+                    
+                    
+                    translate([ 0, 0, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                        cyl(
+                            d = (main_propeller_mount_diameter * 0.95) + (sun_gear_axis_diameter + (motor_mount_wall_thickness * 2)),
+                            h = motor_mount_wall_thickness
+                        );
+                }
+            
+                translate([ 0, 0, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                    cyl(
+                        d = (main_propeller_mount_diameter * 0.95) + (2 * PRINTER_SLOP),
+                        h = motor_mount_wall_thickness + (2 * PRINTER_SLOP)
+                    );
+            }
+            
+            // propeller mount latch
+            for (i = [ 0 : 4 ])
+            {
+                a = 45 + (90 * i);
+                r = (main_propeller_mount_diameter * 0.95 / 2);
+                
+                translate([ cos(a) * r, sin(a) * r, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
+                    sphere(
+                        r = motor_mount_wall_thickness / 2
+                    );
+            }
         }
     }
 
@@ -570,8 +651,8 @@ module profan(
 }
 
 HAS_RING = false;
-HAS_PLANETS = true;
-HAS_SUN = false;
+HAS_PLANETS = false;
+HAS_SUN = true;
 HAS_CARRIER = false;
 HAS_TOP_HOLDER = false;
 HAS_BOTTOM_HOLDER = false;
