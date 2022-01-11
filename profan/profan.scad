@@ -106,6 +106,9 @@ module profan(
     propeller_mount_thickness = 3;
     propeller_mount_num_of_teeth = 8;
     
+    propeller_blade_pitch = 4 * INCH_MM; // the more the pitch - the more flat the blade; try 8 inch and 12 inch values
+    propeller_blade_pad_radius = 0.25 * INCH_MM;
+    
     // calculated parameters
     ring_gear_module = ring_gear_pitch_diameter / ring_gear_num_of_teeth;
 
@@ -574,13 +577,29 @@ module profan(
     
     module propeller()
     {
-        // propeller blades
-        // translate([0, 0, 0])   bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM);
-        // translate([0, 25, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline());
-        // translate([0, 50, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = rectangular_outline(taper_tip = 0.5));
-        // translate([0, 75, 0])  bladegen(pitch = 4 * INCH_MM, diameter = 5 * INCH_MM, outline = elliptical_outline(exponent = 5));
-        
-        // spur_gear(mod = propeller_mount_module, teeth = propeller_mount_num_of_teeth, thickness = propeller_mount_thickness);
+        union()
+        {
+            // propeller blades
+            translate([ (propeller_mount_thickness / 2) * 3, 0, propeller_blade_pad_radius / 2 ])
+                // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter);
+                // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline());
+                // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline(taper_tip = 0.5));
+                bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = elliptical_outline(exponent = 5));
+            
+            rotate([ 0, 90, 0 ])
+                spur_gear(
+                    mod = propeller_mount_module - (PRINTER_SLOP / 6),
+                    teeth = propeller_mount_num_of_teeth,
+                    thickness = propeller_mount_thickness - PRINTER_SLOP
+                );
+            
+            translate([ propeller_mount_thickness, 0, 0 ])
+                rotate([ 0, 90, 0 ])
+                    cyl(
+                        r = propeller_blade_pad_radius,
+                        h = propeller_mount_thickness
+                    );
+        }
     }
 
     // assemble everything together
@@ -647,15 +666,21 @@ module profan(
             translate([ 0, 0, -(motor_mount_hole_depth + ring_gear_thickness + holder_thickness) ])
                 bottom_holder();
         }
+        
+        if (HAS_PROPELLER)
+        {
+            propeller();
+        }
     }
 }
 
 HAS_RING = false;
 HAS_PLANETS = false;
-HAS_SUN = true;
+HAS_SUN = false;
 HAS_CARRIER = false;
 HAS_TOP_HOLDER = false;
 HAS_BOTTOM_HOLDER = false;
+HAS_PROPELLER = true;
 
 DEBUG = true;
 
