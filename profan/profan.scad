@@ -106,7 +106,7 @@ module profan(
     propeller_mount_thickness = 3;
     propeller_mount_num_of_teeth = 8;
     
-    propeller_blade_pitch = 4 * INCH_MM; // the more the pitch - the more flat the blade; try 8 inch and 12 inch values
+    propeller_blade_pitch = 8 * INCH_MM; // the more the pitch - the more flat the blade; try 8 inch and 12 inch values
     propeller_blade_pad_radius = 0.25 * INCH_MM;
     
     // calculated parameters
@@ -233,15 +233,21 @@ module profan(
                 for (i = [ 0 : num_of_propellers ])
                 {
                     a = (360 / num_of_propellers) * i;
-                    r = (main_propeller_mount_diameter / 2) - (propeller_mount_thickness);
+                    r = (main_propeller_mount_diameter / 2) - (propeller_mount_thickness) - (PRINTER_SLOP * 4);
                     
                     translate([ cos(a) * r, sin(a) * r, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) ])
                         rotate([ 90, 0, 90 + a ])
-                            spur_gear(mod = propeller_mount_module, teeth = propeller_mount_num_of_teeth, thickness = propeller_mount_thickness + (PRINTER_SLOP * 2));
+                            spur_gear(
+                                mod = propeller_mount_module + (PRINTER_SLOP / 2), 
+                                teeth = propeller_mount_num_of_teeth,
+                                thickness = propeller_mount_thickness * 2,
+                                clearance = -PRINTER_SLOP * 2
+                            );
                 }
                 
                 // groove
-                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness * (1 - propeller_mount_groove_offset_z)) ])
+                // translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness * (1 - propeller_mount_groove_offset_z)) ])
+                translate([ 0, 0, (sun_gear_thickness / 2) ])
                     torus(
                         r_maj = propeller_mount_groove_radius,
                         r_min = (motor_mount_wall_thickness / 2) + (2 * PRINTER_SLOP)
@@ -351,14 +357,14 @@ module profan(
             }
             
             // propeller mount latch
-            for (i = [ 0 : 4 ])
+            for (i = [ 0 : num_of_planets ])
             {
-                a = 45 + (90 * i);
+                a = ((360 / num_of_planets) * i);
                 r = (main_propeller_mount_diameter * 0.95 / 2);
                 
                 translate([ cos(a) * r, sin(a) * r, (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
                     sphere(
-                        r = motor_mount_wall_thickness / 2
+                        r = motor_mount_wall_thickness / 2.5
                     );
             }
         }
@@ -676,11 +682,11 @@ module profan(
 
 HAS_RING = false;
 HAS_PLANETS = false;
-HAS_SUN = false;
+HAS_SUN = true;
 HAS_CARRIER = false;
 HAS_TOP_HOLDER = false;
 HAS_BOTTOM_HOLDER = false;
-HAS_PROPELLER = true;
+HAS_PROPELLER = false;
 
 DEBUG = true;
 
