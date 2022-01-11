@@ -141,7 +141,7 @@ module profan(
 
     planet_gear_mm_per_tooth = (PI * planet_gear_pitch_diameter) / planet_gear_num_of_teeth;
 
-    planet_gear_vent_diameter = (planet_gear_pitch_diameter - planet_gear_axis_diameter - (4 * motor_mount_wall_thickness)) / 2;
+    planet_gear_vent_diameter = (planet_gear_pitch_diameter - planet_gear_axis_diameter - (5 * motor_mount_wall_thickness)) / 2;
     
     main_propeller_mount_diameter = sun_gear_pitch_diameter + (propeller_joint_thickness * 2);
     main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (6 * motor_mount_wall_thickness);
@@ -155,7 +155,7 @@ module profan(
             {
                 spur_gear(
                     // mm_per_tooth = planet_gear_mm_per_tooth,
-                    mod = ring_gear_module,
+                    mod = ring_gear_module - (PRINTER_SLOP / 6),
                     teeth = planet_gear_num_of_teeth,
                     thickness = planet_gear_thickness
                     //hole_diameter = 0
@@ -168,6 +168,7 @@ module profan(
                     );
             }
 
+            // vents
             for (i = [ 1 : num_of_planet_gear_vents ])
             {
                 a = (360 / num_of_planet_gear_vents) * i;
@@ -176,7 +177,7 @@ module profan(
                 translate([ cos(a) * r, sin(a) * r, 0 ])
                     rotate([ 0, 0, a ])
                         cyl(
-                            d = planet_gear_vent_diameter,
+                            d = planet_gear_vent_diameter - (2 * PRINTER_SLOP),
                             h = planet_gear_thickness + (2 * PRINTER_SLOP)
                         );
             }
@@ -535,7 +536,7 @@ module profan(
         {
             for (i = [ 0 : num_of_planets - 1 ])
             {
-                translate([ planet_gear_pitch_diameter * 1.2 * (i - 1), ring_gear_pitch_diameter * 0.85, 0 ])
+                translate([ planet_gear_pitch_diameter * 1.2 * (i - 1), 0, 0 ])
                     rotate([ 180, 0, 0 ])
                         planet_gear();
             }
@@ -569,8 +570,8 @@ module profan(
 }
 
 HAS_RING = false;
-HAS_PLANETS = false;
-HAS_SUN = true;
+HAS_PLANETS = true;
+HAS_SUN = false;
 HAS_CARRIER = false;
 HAS_TOP_HOLDER = false;
 HAS_BOTTOM_HOLDER = false;
