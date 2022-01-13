@@ -106,7 +106,7 @@ module profan(
     propeller_mount_thickness = 3;
     propeller_mount_num_of_teeth = 8;
     
-    propeller_blade_pitch = 8 * INCH_MM; // the more the pitch - the more flat the blade; try 8 inch and 12 inch values
+    propeller_blade_pitch = 42 * INCH_MM; // the more the pitch - the more flat the blade; try 8 inch and 12 inch values
     propeller_blade_pad_radius = 0.25 * INCH_MM;
     
     // calculated parameters
@@ -467,132 +467,6 @@ module profan(
             }
         }
     }
-
-    /*module top_holder()
-    {
-        difference()
-        {
-            union()
-            {
-                for (i = [ 0 : 4 ])
-                {
-                    a = 45 + (90 * i);
-                    r = sqrt(pow(case_size / 2, 2) + pow(case_size / 2, 2)) - (case_mount_diameter + (motor_mount_wall_thickness * 3)) / 2;
-
-                    difference()
-                    {
-                        union()
-                        {
-                            // arm
-                            translate([ cos(a) * (r / 2), sin(a) * (r / 2), 0 ])
-                                rotate([ 0, 0, a ])
-                                    cuboid(
-                                        size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), holder_thickness ],
-                                        anchor = CENTER
-                                    );
-
-                            // mounting hole
-                            translate([ cos(a) * r, sin(a) * r, 0 ])
-                                cyl(
-                                    d = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
-                                    h = holder_thickness,
-                                    anchor = CENTER
-                                );
-                        }
-
-                        translate([ cos(a) * r, sin(a) * r, 0 ])
-                            cyl(
-                                d = case_mount_diameter + (PRINTER_SLOP * 2),
-                                h = holder_thickness + (PRINTER_SLOP * 2),
-                                anchor = CENTER
-                            );
-                    }
-                }
-
-                // stopper for planet gears
-                difference()
-                {
-                    cyl(
-                        d = (sun_gear_pitch_diameter + planet_gear_pitch_diameter + planet_gear_axis_diameter) + holder_thickness,
-                        h = holder_thickness
-                    );
-
-                    cyl(
-                        d = (sun_gear_pitch_diameter + planet_gear_pitch_diameter - planet_gear_axis_diameter - motor_mount_wall_thickness),
-                        h = holder_thickness + (PRINTER_SLOP * 2)
-                    );
-                }
-            }
-
-            // translate([ 0, 0, -(sun_gear_axis_height / 2) ])
-                cyl(
-                    d = sun_gear_axis_diameter,
-                    h = sun_gear_axis_height * 2
-                );
-        }
-    }*/
-
-    /*module bottom_holder()
-    {
-        difference()
-        {
-            union()
-            {
-                for (i = [ 0 : 4 ])
-                {
-                    a = 45 + (90 * i);
-                    r = sqrt(pow(case_size / 2, 2) + pow(case_size / 2, 2)) - (case_mount_diameter + (motor_mount_wall_thickness * 3)) / 2;
-
-                    difference()
-                    {
-                        union()
-                        {
-                            // arm
-                            translate([ cos(a) * (r / 2), sin(a) * (r / 2), 0 ])
-                                rotate([ 0, 0, a ])
-                                    cuboid(
-                                        size = [ r, sun_gear_axis_diameter + (motor_mount_wall_thickness * 2), holder_thickness ],
-                                        anchor = CENTER
-                                    );
-
-                            // mounting hole
-                            translate([ cos(a) * r, sin(a) * r, 0 ])
-                                cyl(
-                                    d = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
-                                    h = holder_thickness,
-                                    anchor = CENTER
-                                );
-                        }
-
-                        translate([ cos(a) * r, sin(a) * r, 0 ])
-                            cyl(
-                                d = case_mount_diameter + (PRINTER_SLOP * 2),
-                                h = holder_thickness + (PRINTER_SLOP * 2),
-                                anchor = CENTER
-                            );
-                    }
-                    
-                    cyl(
-                        d = motor_mount_hole_diameter + (6 * motor_mount_wall_thickness),
-                        h = holder_thickness
-                    );
-                }
-            }
-            
-            if (!DEBUG)
-            {
-                cyl(
-                    d = motor_mount_hole_diameter + (PRINTER_SLOP * 2),
-                    h = holder_thickness + (PRINTER_SLOP * 2)
-                );
-            } else {
-                cyl(
-                    d = sun_gear_axis_diameter,
-                    h = holder_thickness + (PRINTER_SLOP * 2)
-                );
-            }
-        }
-    }*/
     
     module propeller()
     {
@@ -605,19 +479,32 @@ module profan(
                 // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline(taper_tip = 0.5));
                 bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = elliptical_outline(exponent = 5));
             
-            rotate([ 0, 90, 0 ])
-                spur_gear(
-                    mod = propeller_mount_module - (PRINTER_SLOP / 6),
-                    teeth = propeller_mount_num_of_teeth,
-                    thickness = propeller_mount_thickness - PRINTER_SLOP
-                );
-            
-            translate([ propeller_mount_thickness, 0, 0 ])
+            translate([ propeller_mount_thickness / 2, 0, 0 ])
                 rotate([ 0, 90, 0 ])
-                    cyl(
-                        r = propeller_blade_pad_radius,
-                        h = propeller_mount_thickness
+                    spur_gear(
+                        mod = propeller_mount_module,
+                        backlash = (PRINTER_SLOP * 2),
+                        teeth = propeller_mount_num_of_teeth,
+                        thickness = (propeller_mount_thickness * 2) // - PRINTER_SLOP
                     );
+            
+            // concave for better fit to mount
+            difference()
+            {
+                translate([ propeller_mount_thickness, 0, 0 ])
+                scale([ 1, 1, 1 ])
+                    rotate([ 0, 90, 0 ])
+                        cyl(
+                            r = propeller_blade_pad_radius,
+                            h = propeller_mount_thickness
+                        );
+                
+                translate([ -((propeller_mount_thickness * 2) + (propeller_mount_thickness / 2)), 0, 0 ])
+                    cyl(
+                        d = main_propeller_mount_diameter_top,
+                        h = main_propeller_mount_thickness
+                    );
+            }
         }
     }
 
@@ -674,18 +561,6 @@ module profan(
                     carrier();
         }
 
-        if (HAS_TOP_HOLDER)
-        {
-            translate([ 0, 0, 50 ])
-                top_holder();
-        }
-
-        if (HAS_BOTTOM_HOLDER)
-        {
-            translate([ 0, 0, -(motor_mount_hole_depth + ring_gear_thickness + holder_thickness) ])
-                bottom_holder();
-        }
-        
         if (HAS_PROPELLER)
         {
             propeller();
@@ -693,13 +568,11 @@ module profan(
     }
 }
 
-HAS_RING = true;
+HAS_RING = false;
 HAS_PLANETS = false;
 HAS_SUN = false;
 HAS_CARRIER = false;
-HAS_TOP_HOLDER = false;
-HAS_BOTTOM_HOLDER = false;
-HAS_PROPELLER = false;
+HAS_PROPELLER = true;
 
 DEBUG = true;
 
