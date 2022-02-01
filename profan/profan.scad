@@ -219,11 +219,11 @@ module profan(
             );
 
             // axis
-            //translate([ 0, 0, (sun_gear_thickness / 2) + (sun_gear_axis_height / 2) ])
-                //cyl(
-                    //d = sun_gear_axis_diameter,
-                    //h = sun_gear_axis_height + (2 * PRINTER_SLOP)
-                //);
+            translate([ 0, 0, -(((sun_gear_thickness + motor_mount_wall_thickness) / 2) + (carrier_arm_thickness / 2)) ])
+                cyl(
+                    d = planet_gear_axis_diameter,
+                    h = carrier_arm_thickness + PRINTER_SLOP //sun_gear_axis_height + (2 * PRINTER_SLOP)
+                );
 
             // brim
             /*translate([ 0, 0, -((sun_gear_thickness / 2) + (sun_gear_axis_height / 2) - (motor_mount_wall_thickness / 4)) ])
@@ -233,11 +233,11 @@ module profan(
                     h = (motor_mount_wall_thickness / 2) // - (2 * PRINTER_SLOP)
                 );*/
                 
-            translate([ 0, 0, (sun_gear_thickness / 2) + (motor_mount_wall_thickness / 2) ])
+            translate([ 0, 0, (sun_gear_thickness / 2) ])
                 cyl(
                     d = (root_radius(mod = ring_gear_module,
                 teeth = sun_gear_num_of_teeth) * 2) + (root_radius(mod = ring_gear_module - (PRINTER_SLOP / 6), teeth = planet_gear_num_of_teeth)), // main_propeller_mount_diameter_base,
-                    h = motor_mount_wall_thickness
+                    h = motor_mount_wall_thickness / 2
                 );
 
             // mount for propeller
@@ -271,12 +271,12 @@ module profan(
                                 clearance = -PRINTER_SLOP * 2
                             );*/
                     
-                    translate([ cos(a) * (r + (propeller_mount_thickness / 2)), sin(a) * (r + (propeller_mount_thickness / 2)), (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) ])
+                    /*translate([ cos(a) * (r + (propeller_mount_thickness / 2)), sin(a) * (r + (propeller_mount_thickness / 2)), (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) ])
                         rotate([ 90, 0, 90 + a ])
                             cyl(
                                 r = propeller_blade_pad_radius,
                                 h = (propeller_mount_thickness * 2) + (PRINTER_SLOP * 4)
-                            );
+                            );*/
                 }
                 
                 // groove
@@ -470,6 +470,12 @@ module profan(
 
                     }
                 }
+                
+                translate([ 0, 0, carrier_arm_thickness + motor_mount_wall_thickness ])
+                    cyl(
+                        d = planet_gear_mount_pad_diameter,
+                        h = carrier_arm_thickness + motor_mount_wall_thickness
+                    );
             }
 
             if (!DEBUG)
@@ -485,20 +491,26 @@ module profan(
             {
                 a = (360 / num_of_planets) * i;
 
-                translate([ cos(a) * carrier_arm_length, sin(a) * carrier_arm_length, carrier_arm_thickness + motor_mount_wall_thickness * 2 ])
+                translate([ cos(a) * carrier_arm_length, sin(a) * carrier_arm_length, carrier_arm_thickness + motor_mount_wall_thickness * 3 ])
                 {
                     cyl(
                         d = planet_gear_mount_pad_inner_diameter,
-                        h = carrier_arm_thickness + motor_mount_wall_thickness
+                        h = carrier_arm_thickness + motor_mount_wall_thickness + PRINTER_SLOP
                     );
                 }
                 
-                translate([ cos(a) * carrier_arm_length, sin(a) * carrier_arm_length, (carrier_arm_thickness / 2) + (motor_mount_wall_thickness / 2) ])
+                translate([ cos(a) * carrier_arm_length, sin(a) * carrier_arm_length, (carrier_arm_thickness / 2) + (motor_mount_wall_thickness / 2) + motor_mount_wall_thickness ])
                     cyl(
                         d = planet_gear_axis_diameter + (4 * PRINTER_SLOP),
                         h = motor_mount_wall_thickness * 2 + (2 * PRINTER_SLOP)
                     );
             }
+            
+            translate([ 0, 0, carrier_arm_thickness + (motor_mount_wall_thickness * 2) + PRINTER_SLOP ])
+                cyl(
+                    d = planet_gear_mount_pad_inner_diameter,
+                    h = carrier_arm_thickness // + motor_mount_wall_thickness
+                );
         }
     }
     
