@@ -476,13 +476,28 @@ module profan(
                     {
                         a = (360 / num_of_planets) * i;
 
-                        rotate([ 90, 0, a ])
-                            prismoid(
-                                size1 = [ main_mount_diameter, carrier_arm_thickness ],
-                                size2 = [ planet_gear_mount_pad_diameter, carrier_arm_thickness ],
-                                h = carrier_arm_length,
-                                orient = RIGHT
-                            );
+                        difference()
+                        {
+                            rotate([ 90, 0, a ])
+                                prismoid(
+                                    size1 = [ main_mount_diameter, carrier_arm_thickness ],
+                                    size2 = [ planet_gear_mount_pad_diameter, carrier_arm_thickness ],
+                                    h = carrier_arm_length,
+                                    orient = RIGHT
+                                );
+                            
+                            r3 = (2 * motor_mount_wall_thickness);
+                            
+                            translate([ cos(a) * r3, sin(a) * r3, 0 ])
+                                rotate([ 90, 0, a ])
+                                    scale([ 0.75, 2, 0.75 ])
+                                    prismoid(
+                                        size1 = [ main_mount_diameter, carrier_arm_thickness ],
+                                        size2 = [ planet_gear_mount_pad_diameter, carrier_arm_thickness ],
+                                        h = carrier_arm_length,
+                                        orient = RIGHT
+                                    );
+                        }
                         
                         /*rotate([ 0, 90, a ])
                         translate([ 0, 0, -planet_gear_mount_pad_diameter / 2 ])
@@ -538,14 +553,14 @@ module profan(
                         h = motor_mount_wall_thickness * 2 + (2 * PRINTER_SLOP)
                     );
                 
-                translate([ cos(a) * (carrier_arm_length / 3), sin(a) * (carrier_arm_length / 3), 6 ])
+                /*translate([ cos(a) * (carrier_arm_length / 3), sin(a) * (carrier_arm_length / 3), 6 ])
                     rotate([ 90, 0, a ])
                         prismoid(
                             size1 = [ main_mount_diameter - (8 * motor_mount_wall_thickness), carrier_arm_thickness * 2 ],
                             size2 = [ planet_gear_mount_pad_diameter - (1 * motor_mount_wall_thickness), carrier_arm_thickness * 2 ],
                             h = carrier_arm_length / 3,
                             orient = RIGHT
-                        );
+                        );*/
             }
             
             translate([ 0, 0, carrier_arm_thickness + (motor_mount_wall_thickness * 2) + PRINTER_SLOP ])
