@@ -2,6 +2,7 @@ include <BOSL2/std.scad>;
 include <BOSL2/shapes3d.scad>;
 include <BOSL2/gears.scad>;
 include <BOSL2/walls.scad>;
+include <BOSL2/drawing.scad>;
 include <bladegen/bladegen.scad>;
 
 /*
@@ -24,7 +25,7 @@ include <bladegen/bladegen.scad>;
 
 module profan(
     num_of_planets = 2,
-    num_of_planet_gear_vents = 6,
+    num_of_planet_gear_vents = 4,
     
     num_of_propellers = 3,
 
@@ -191,18 +192,50 @@ module profan(
             }
 
             // vents
-            for (i = [ 1 : num_of_planet_gear_vents ])
+            difference()
+            {
+                cyl(
+                    r = (planet_gear_root_diameter / 2) - motor_mount_wall_thickness,
+                    h = planet_gear_axis_height
+                );
+                
+                for (i = [ 1 : num_of_planet_gear_vents ])
+                {
+                    a = (360 / num_of_planet_gear_vents) * i;
+                    
+                    w = (planet_gear_root_diameter / 2) - (planet_gear_axis_diameter / 2);
+                    
+                    r = (planet_gear_root_diameter / 2) - (w / 2) + (planet_gear_axis_diameter / 2);
+                    
+                    translate([ cos(a) * r, sin(a) * r, 0 ])
+                        rotate([ 0, 0, a ])
+                            cuboid(
+                                size = [ w, motor_mount_wall_thickness * 2, planet_gear_axis_height + PRINTER_SLOP ]
+                            );
+                }
+                
+                cyl(
+                    r = planet_gear_axis_diameter + (1 * motor_mount_wall_thickness),
+                    h = planet_gear_axis_height + PRINTER_SLOP
+                );
+            }
+            
+            /*for (i = [ 1 : num_of_planet_gear_vents ])
             {
                 a = (360 / num_of_planet_gear_vents) * i;
+                b = (360 / num_of_planet_gear_vents) * (i - 1);
+                
                 r = (planet_gear_root_diameter / 2) - (motor_mount_wall_thickness / 3) - (planet_gear_vent_diameter / 2);
 
                 translate([ cos(a) * r, sin(a) * r, 0 ])
-                    rotate([ 0, 0, a ])
-                        cyl(
-                            d = planet_gear_vent_diameter - (2 * PRINTER_SLOP),
-                            h = planet_gear_thickness + (2 * PRINTER_SLOP)
-                        );
-            }
+                    // rotate([ 0, 0, a ])
+                        difference()
+                        {
+                            arc(r = 1.5 * r, angle = [ b, a ], wedge = true);
+                            
+                            cyl(r = 0.5 * r, h = planet_gear_axis_height);
+                        }
+            }*/
         }
     }
 
@@ -504,6 +537,15 @@ module profan(
                         d = planet_gear_axis_diameter + (4 * PRINTER_SLOP),
                         h = motor_mount_wall_thickness * 2 + (2 * PRINTER_SLOP)
                     );
+                
+                translate([ cos(a) * (carrier_arm_length / 3), sin(a) * (carrier_arm_length / 3), 6 ])
+                    rotate([ 90, 0, a ])
+                        prismoid(
+                            size1 = [ main_mount_diameter - (8 * motor_mount_wall_thickness), carrier_arm_thickness * 2 ],
+                            size2 = [ planet_gear_mount_pad_diameter - (1 * motor_mount_wall_thickness), carrier_arm_thickness * 2 ],
+                            h = carrier_arm_length / 3,
+                            orient = RIGHT
+                        );
             }
             
             translate([ 0, 0, carrier_arm_thickness + (motor_mount_wall_thickness * 2) + PRINTER_SLOP ])
