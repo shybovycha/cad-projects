@@ -160,7 +160,7 @@ module profan(
     planet_gear_root_diameter = root_radius(pitch = sun_gear_mm_per_tooth, teeth = planet_gear_num_of_teeth) * 2;
     
     main_propeller_mount_diameter = sun_gear_pitch_diameter + (propeller_joint_thickness * 2);
-    main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (6 * motor_mount_wall_thickness);
+    main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (2 * motor_mount_wall_thickness);
     
     ring_gear_brim_width = (adendum(mod = ring_gear_module) + dedendum(mod = ring_gear_module)) * 2;
     
@@ -276,10 +276,10 @@ module profan(
             // mount for propeller
             difference()
             {
-                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2)])
+                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) - (motor_mount_wall_thickness / 2)])
                     cyl(
                         d = main_propeller_mount_diameter_top,
-                        h = main_propeller_mount_thickness,
+                        h = main_propeller_mount_thickness - motor_mount_wall_thickness,
                         rounding2 = 10
                     );
                 
@@ -295,7 +295,7 @@ module profan(
                                     mod = propeller_mount_module + (PRINTER_SLOP / 2),
                                     teeth = propeller_mount_num_of_teeth
                                 ),
-                                h = (propeller_mount_thickness * 4)
+                                h = (propeller_mount_thickness * 5)
                             );
                             /*spur_gear(
                                 mod = propeller_mount_module + (PRINTER_SLOP / 2), 
@@ -320,6 +320,13 @@ module profan(
                         r_min = (motor_mount_wall_thickness / 2) + (2 * PRINTER_SLOP)
                     );*/
             }
+            
+            /*translate([ 0, 0, (sun_gear_thickness * 1.5) + main_propeller_mount_thickness - motor_mount_wall_thickness * 2 ])
+            cyl(
+                l = (2 * motor_mount_wall_thickness),
+                d1 = main_propeller_mount_diameter_top,
+                d2 = 0.5
+            );*/
         }
     }
 
