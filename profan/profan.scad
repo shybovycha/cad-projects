@@ -129,7 +129,7 @@ module profan(
     planet_gear_mount_pad_thickness = 3 + (PRINTER_SLOP * 2);
     
     // according to the ball bearing inner diameter
-    planet_gear_axis_diameter = 7 - (PRINTER_SLOP * 2);
+    planet_gear_axis_diameter = 7 + PRINTER_SLOP;
     planet_gear_axis_height = 10;
 
     // circular pitch
@@ -186,7 +186,7 @@ module profan(
 
                 translate([ 0, 0, -(planet_gear_thickness / 2) - (planet_gear_axis_height / 2) ])
                     cyl(
-                        d = planet_gear_axis_diameter - (PRINTER_SLOP * 2),
+                        d = planet_gear_axis_diameter,
                         h = planet_gear_axis_height
                     );
             }
@@ -203,19 +203,19 @@ module profan(
                 {
                     a = (360 / num_of_planet_gear_vents) * i;
                     
-                    w = (planet_gear_root_diameter / 2) - (planet_gear_axis_diameter / 2);
+                    w = (planet_gear_root_diameter / 2);
                     
                     r = (planet_gear_root_diameter / 2) - (w / 2) + (planet_gear_axis_diameter / 2);
                     
                     translate([ cos(a) * r, sin(a) * r, 0 ])
                         rotate([ 0, 0, a ])
                             cuboid(
-                                size = [ w, motor_mount_wall_thickness * 2, planet_gear_axis_height + PRINTER_SLOP ]
+                                size = [ w, motor_mount_wall_thickness * 1.25, planet_gear_axis_height + PRINTER_SLOP ]
                             );
                 }
                 
                 cyl(
-                    r = planet_gear_axis_diameter + (1 * motor_mount_wall_thickness),
+                    r = planet_gear_axis_diameter,
                     h = planet_gear_axis_height + PRINTER_SLOP
                 );
             }
@@ -705,9 +705,9 @@ module profan(
 }
 
 HAS_RING = false;
-HAS_PLANETS = false;
+HAS_PLANETS = true;
 HAS_SUN = false;
-HAS_CARRIER = true;
+HAS_CARRIER = false;
 HAS_PROPELLER = false;
 
 DEBUG = true;
@@ -716,6 +716,6 @@ ASSEMBLY = false;
 
 $slop = 0.15;
 PRINTER_SLOP = $slop;
-$fn = 64;
+$fn = 256;
 
-profan(num_of_planets = 3, num_of_propellers = 3);
+profan(num_of_planets = 1, num_of_propellers = 3);
