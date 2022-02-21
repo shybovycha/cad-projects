@@ -30,7 +30,19 @@ module profan(
     num_of_propellers = 3,
 
     ring_gear_num_of_teeth = 96,
-    planet_gear_num_of_teeth = 42
+    planet_gear_num_of_teeth = 42,
+    
+    case_size = 120,
+
+    motor_mount_hole_depth = 15,
+    motor_mount_hole_diameter = 37.25,
+    motor_mount_wall_thickness = 2.5,
+
+    ring_gear_pitch_diameter = 110,
+
+    case_mount_diameter = 4.3,
+    
+    helical = 0
 )
 {
     // critical dimensions:
@@ -83,16 +95,6 @@ module profan(
     // IMPORTANT: all gears' modules must be equal
 
     // constants
-    case_size = 120;
-
-    motor_mount_hole_depth = 15;
-    motor_mount_hole_diameter = 37.25;
-    motor_mount_wall_thickness = 2.5;
-
-    ring_gear_pitch_diameter = 110;
-
-    case_mount_diameter = 4.3;
-
     INCH_MM = 25.6;
 
     // TODO: parametrize
@@ -100,6 +102,8 @@ module profan(
     ring_gear_thickness = 10;
     sun_gear_thickness = 2 * motor_mount_wall_thickness;
     holder_thickness = 5;
+    
+    min_propeller_mount_diameter = 22;
 
     sun_gear_axis_height = 5;
     
@@ -159,12 +163,13 @@ module profan(
     
     planet_gear_root_diameter = root_radius(pitch = sun_gear_mm_per_tooth, teeth = planet_gear_num_of_teeth) * 2;
     
-    main_propeller_mount_diameter = sun_gear_pitch_diameter + (propeller_joint_thickness * 2);
+    main_propeller_mount_diameter = min(sun_gear_pitch_diameter + (propeller_joint_thickness * 2), min_propeller_mount_diameter);
     main_propeller_mount_thickness = (propeller_joint_thickness * 2) + (2 * motor_mount_wall_thickness);
     
     ring_gear_brim_width = (adendum(mod = ring_gear_module) + dedendum(mod = ring_gear_module)) * 2;
     
     main_propeller_mount_diameter_base = main_propeller_mount_diameter;
+    
     main_propeller_mount_diameter_top = main_propeller_mount_diameter * 0.75;
     
     propeller_mount_groove_offset_z = 0.9;
@@ -177,11 +182,10 @@ module profan(
             union()
             {
                 spur_gear(
-                    // mm_per_tooth = planet_gear_mm_per_tooth,
                     mod = ring_gear_module - (PRINTER_SLOP / 6),
                     teeth = planet_gear_num_of_teeth,
-                    thickness = planet_gear_thickness
-                    //hole_diameter = 0
+                    thickness = planet_gear_thickness,
+                    helical = helical
                 );
 
                 translate([ 0, 0, -(planet_gear_thickness / 2) - (planet_gear_axis_height / 2) ])
@@ -244,11 +248,10 @@ module profan(
         union()
         {
             spur_gear(
-                // mm_per_tooth = sun_gear_mm_per_tooth,
                 mod = ring_gear_module,
                 teeth = sun_gear_num_of_teeth,
-                thickness = sun_gear_thickness + motor_mount_wall_thickness + (PRINTER_SLOP * 2)
-                //hole_diameter = 0
+                thickness = sun_gear_thickness + motor_mount_wall_thickness + (PRINTER_SLOP * 2),
+                helical = helical
             );
 
             // axis
@@ -266,7 +269,7 @@ module profan(
                     h = (motor_mount_wall_thickness / 2) // - (2 * PRINTER_SLOP)
                 );*/
                 
-            translate([ 0, 0, (sun_gear_thickness / 2) ])
+            translate([ 0, 0, (sun_gear_thickness / 2) + (motor_mount_wall_thickness / 2) ])
                 cyl(
                     d = (root_radius(mod = ring_gear_module,
                 teeth = sun_gear_num_of_teeth) * 2) + (root_radius(mod = ring_gear_module - (PRINTER_SLOP / 6), teeth = planet_gear_num_of_teeth)), // main_propeller_mount_diameter_base,
@@ -276,11 +279,11 @@ module profan(
             // mount for propeller
             difference()
             {
-                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) - (motor_mount_wall_thickness / 2)])
+                translate([ 0, 0, (sun_gear_thickness / 2) + (main_propeller_mount_thickness / 2) - (motor_mount_wall_thickness / 2) ])
                     cyl(
                         d = main_propeller_mount_diameter_top,
                         h = main_propeller_mount_thickness - motor_mount_wall_thickness,
-                        rounding2 = 10
+                        rounding2 = 8
                     );
                 
                 for (i = [ 0 : num_of_propellers ])
@@ -347,11 +350,10 @@ module profan(
                 translate([ 0, 0, -(motor_mount_wall_thickness * 2) ])
                     spur_gear(
                         mod = ring_gear_module,
-                        // mm_per_tooth = ring_gear_mm_per_tooth,
                         teeth = ring_gear_num_of_teeth,
                         thickness = ring_gear_thickness + (4 * motor_mount_wall_thickness) + (PRINTER_SLOP),
-                        //hole_diameter = 0,
-                        interior = true
+                        interior = true,
+                        helical = helical
                     );
 
                 // mounting holes
@@ -399,7 +401,7 @@ module profan(
             }
             
             // propeller mount support
-            difference()
+            /*difference()
             {
                 union()
                 {
@@ -412,12 +414,12 @@ module profan(
                         translate([ cos(a) * (r / 2), sin(a) * (r / 2), (ring_gear_thickness / 2) - (motor_mount_wall_thickness / 2) ])
                             rotate([ 0, 0, a ])
                                 // TODO: does not work in BOSL2
-                                /*sparse_strut(
-                                    h = motor_mount_wall_thickness,
-                                    l = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
-                                    thick = motor_mount_wall_thickness,
-                                    anchor = CENTER
-                                );*/
+                                //sparse_strut(
+                                    //h = motor_mount_wall_thickness,
+                                    //l = sun_gear_axis_diameter + (motor_mount_wall_thickness * 2),
+                                    //thick = motor_mount_wall_thickness,
+                                    //anchor = CENTER
+                                //);
                         
                                 cuboid(
                                     size = [ r, sun_gear_axis_diameter, motor_mount_wall_thickness ],
@@ -438,7 +440,7 @@ module profan(
                         d = main_propeller_mount_diameter_top + (8 * PRINTER_SLOP),
                         h = motor_mount_wall_thickness + (2 * PRINTER_SLOP)
                     );
-            }
+            }*/
             
             // propeller mount latch
             /*for (i = [ 0 : num_of_planets ])
@@ -466,7 +468,7 @@ module profan(
                 if (DEBUG)
                 {
                     cyl(
-                        d = sun_gear_axis_diameter,
+                        d = min(sun_gear_axis_diameter, 8),
                         h = motor_mount_hole_depth + motor_mount_wall_thickness
                     );
                 } else {
@@ -591,19 +593,19 @@ module profan(
                 // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline());
             
                 // "sharp"
-                // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline(taper_tip = 0.5));
+                bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = rectangular_outline(taper_tip = 0.5));
             
                 // "butterknife"
-                bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = elliptical_outline(exponent = 5));
+                // bladegen(pitch = propeller_blade_pitch, diameter = ring_gear_pitch_diameter, outline = elliptical_outline(exponent = 5));
             
-            translate([ -(propeller_mount_thickness / 2), 0, 0 ])
+            translate([ -(propeller_mount_thickness / 2) + 1.4, 0, 0 ])
                 rotate([ 0, 90, 0 ])
                     cyl(
                         r = outer_radius(
                             mod = propeller_mount_module,
                             teeth = propeller_mount_num_of_teeth
-                        ),
-                        h = (propeller_mount_thickness * 3.5)
+                        ) + 0.3,
+                        h = (propeller_mount_thickness * 3.5) - 2.8
                     );
             
                     /*spur_gear(
@@ -705,17 +707,29 @@ module profan(
 }
 
 HAS_RING = false;
-HAS_PLANETS = true;
-HAS_SUN = false;
+HAS_PLANETS = false;
+HAS_SUN = true;
 HAS_CARRIER = false;
 HAS_PROPELLER = false;
 
-DEBUG = true;
+DEBUG = false;
 
 ASSEMBLY = false;
 
 $slop = 0.15;
 PRINTER_SLOP = $slop;
 $fn = 256;
+GEAR_SLICES = 12;
 
-profan(num_of_planets = 1, num_of_propellers = 3);
+profan(
+    num_of_planets = 2,
+    num_of_propellers = 3,
+    ring_gear_num_of_teeth = 96,
+    planet_gear_num_of_teeth = 32,
+    case_size = 140,
+    ring_gear_pitch_diameter = 130,
+    helical = 0,
+    motor_mount_hole_depth = 20,
+    motor_mount_hole_diameter = 50,
+    motor_mount_wall_thickness = 2.5
+);
