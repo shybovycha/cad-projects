@@ -41,9 +41,9 @@ if (HAS_INNER_BOX)
                 prismoid(size1 = [55 + wall_thickness + $slop, 30 + wall_thickness + $slop], size2 = [55 + wall_thickness + $slop, 30 + wall_thickness + $slop], chamfer = 5, h = wall_thickness);
         }
 
-        translate([ 0, wall_thickness, wall_thickness / 2 - $slop ])
+        translate([ 0, wall_thickness / 2 + 2 * $slop, wall_thickness / 2 - $slop ])
             // prismoid(size1 = [55, 40], size2 = [55, 40], chamfer = 5, h = 70);
-            prismoid(size1 = [55 - wall_thickness, 35 - wall_thickness], size2 = [55 - wall_thickness, 35 - wall_thickness], chamfer = 5, h = 70 - wall_thickness);
+            prismoid(size1 = [55 - wall_thickness - $slop, 35 - wall_thickness], size2 = [55 - wall_thickness - $slop, 35 - wall_thickness], chamfer = 5, h = 70 - wall_thickness);
         
         translate([ -8, 0, 70 + wall_thickness ])
             cyl(r = 1.5, h = wall_thickness * 4);
