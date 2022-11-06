@@ -65,6 +65,8 @@ module stand()
     
     stem_offset = dovetail_vertical_height / 4;
     
+    leg_offset = 8 / cos(back_legs_spread_angle);
+    
     union()
     {
         // dovetail
@@ -78,18 +80,65 @@ module stand()
                 prismoid(size1 = [ stem_height - stem_offset * 2, 8 ], size2 = [ stem_height - stem_offset * 2 + (dovetail_vertical_height / 2), 8 ], shift = [ stem_offset, 0 ], h = 8);
         
         // legs
-        translate([ 0, (leg_horizontal_length / 2), -(leg_vertical_height / 2) + (dovetail_vertical_height / 2) ])
+        difference()
         {
-            translate([ (leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 0 ])
-                rotate([ dovetail_incline_angle, -back_legs_spread_angle, 0 ])
-                    rotate([ 0, -90, -90 ])
-                        prismoid(size1 = [ leg_length, 8 ], size2 = [ leg_length + stem_offset / 2, 8 ], h = 8);
-        
-            translate([ -(leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 0 ])
-                rotate([ dovetail_incline_angle, back_legs_spread_angle, 0 ])
-                    rotate([ 0, -90, -90 ])
-                        prismoid(size1 = [ leg_length, 8 ], size2 = [ leg_length + stem_offset / 2, 8 ], h = 8);
+            translate([ 0, (leg_horizontal_length / 2) - (dovetail_horizontal_length / 2) + (stem_offset * 2), -(leg_vertical_height / 2) + (dovetail_vertical_height / 2) ])
+            {
+                translate([ (leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 0 ])
+                    rotate([ dovetail_incline_angle, -back_legs_spread_angle, 0 ])
+                        cuboid([ 8, 8, leg_length ]);
+            }
+            
+            
+            /*// second leg as a mask
+            translate([ 0, (leg_horizontal_length / 2) - (dovetail_horizontal_length / 2) + (stem_offset * 2), -(leg_vertical_height / 2) + (dovetail_vertical_height / 2) ])
+            {
+                translate([ -(leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 4 / 2 ])
+                    rotate([ dovetail_incline_angle, back_legs_spread_angle, 0 ])
+                        cuboid([ 8 + 4, 8 + 4, leg_length + 4 ]);
+            }*/
+            
+            
+            // translate([ -(8 + 4) / 2, 0, -leg_vertical_height / 2 + dovetail_vertical_height ])
+                // cuboid([ 8 + 4, 8 + 4, leg_vertical_height ]);
+            
+            // dovetail as a mask
+            translate([ 0, -4, 0 ])
+                rotate([ dovetail_incline_angle, 0, 0 ])
+                    prismoid(size1 = [ 8 + 4, dovetail_length ], size2 = [ 12 + 4, dovetail_length ], h = 4 + 4);
+            
+            //translate([ 0, -8 - 2, 0 ])
+                //rotate([ dovetail_incline_angle, back_legs_spread_angle, 0 ])
+                    //cuboid([ 8, 8, leg_length / 2 ]);
         }
+        
+        difference()
+        {
+            translate([ 0, (leg_horizontal_length / 2) - (dovetail_horizontal_length / 2) + (stem_offset * 2), -(leg_vertical_height / 2) + (dovetail_vertical_height / 2) ])
+            {
+                translate([ -(leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 0 ])
+                    rotate([ dovetail_incline_angle, back_legs_spread_angle, 0 ])
+                        cuboid([ 8, 8, leg_length ]);
+            }
+            
+            /*// first leg as a mask
+            translate([ 0, (leg_horizontal_length / 2) - (dovetail_horizontal_length / 2) + (stem_offset * 2), -(leg_vertical_height / 2) + (dovetail_vertical_height / 2) ])
+            {
+                translate([ (leg_vertical_height / 2) * sin(back_legs_spread_angle), 0, 4 ])
+                    rotate([ dovetail_incline_angle, -back_legs_spread_angle, 0 ])
+                        cuboid([ 8 + 4, 8 + 4, leg_length + 4 ]);
+            }*/
+            
+            // dovetail as a mask
+            translate([ 0, -4, 0 ])
+                rotate([ dovetail_incline_angle, 0, 0 ])
+                    prismoid(size1 = [ 8 + 4, dovetail_length ], size2 = [ 12 + 4, dovetail_length ], h = 4 + 4);
+        }
+        
+        // joint
+        // translate([ 0, -4, 0 ])
+            // rotate([ 0, 180, -90 ])
+                // prismoid(size1 = [ (dovetail_horizontal_length / 2) - 4, 8 ], size2 = [ leg_horizontal_length - 4 - 16, 8 ], shift = [ leg_horizontal_length / 4 - 8, 0 ], h = leg_vertical_height / 4);
     }
 }
 
