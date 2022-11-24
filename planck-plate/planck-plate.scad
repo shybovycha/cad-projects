@@ -49,18 +49,9 @@ module base2()
                     trimcorners = true
                 );
             
-            translate([ -3 - 0.25/2, -3, 2.5 + 3 ])
+            translate([ -3 - 0.25/2, -3, 2.5 + 1.5 + 10 ])
                 cuboid(
-                    size = [ 228 + 6.275, 76 + 6.2, 15 ],
-                    anchor = FRONT + BOTTOM + LEFT
-                );
-        }
-        
-        difference()
-        {
-            translate([ -3, -3, 25 - 20 ])
-                cuboid(
-                    size = [ 228 + 6 + 1.5, 76 + 6 + 1.5, 9 ],
+                    size = [ 228 + 6.275, 76 + 6.2, 5 ],
                     anchor = FRONT + BOTTOM + LEFT
                 );
             
@@ -71,6 +62,7 @@ module base2()
                 );
         }
         
+      
         color([ 0, 0.5, 0 ])
         translate([ 228/2, 76 + 3, -2.5 ])
             prismoid(
@@ -210,11 +202,11 @@ module base2_middle_section()
     }
 }
 
-base2_left_half();
+// base2_left_half();
 
 // base2_right_half();
 
-// base2_middle_section();
+base2_middle_section();
 
 // translate([ 0, 0, 15 ])
 // plate();
