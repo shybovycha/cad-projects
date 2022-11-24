@@ -35,33 +35,6 @@ module plate()
     }
 }
 
-module base()
-{
-    difference()
-    {
-        translate([ -3 - 3, -3 - 3, 2.5 ])
-            cuboid(
-                size = [ 228 + 6 + 6, 76 + 6 + 6, 25 ],
-                anchor = FRONT + BOTTOM + LEFT,
-                chamfer = 1,
-                trimcorners = true
-            );
-        
-        translate([ -3, -3, 2.5 + 3 ])
-            cuboid(
-                size = [ 228 + 6, 76 + 6, 25 ],
-                anchor = FRONT + BOTTOM + LEFT,
-                chamfer = 1,
-                trimcorners = true
-            );
-        
-        translate([ 114.5, 76.4, 2.5 + 25 - 2.4 ])
-            cuboid(
-                size = [ 65 + 10, 25, 2 + 3 ]
-            );
-    }
-}
-
 module base2()
 {
     union()
@@ -237,11 +210,11 @@ module base2_middle_section()
     }
 }
 
-// base2_left_half();
+base2_left_half();
 
 // base2_right_half();
 
-base2_middle_section();
+// base2_middle_section();
 
 // translate([ 0, 0, 15 ])
 // plate();
