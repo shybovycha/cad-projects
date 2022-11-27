@@ -136,7 +136,7 @@ module stand()
                     prismoid(size1 = [ dovetail_horizontal_length, 8 ], size2 = [ leg_spread_length, 8 ], h = leg_vertical_height, orient = FWD);
                 
                 translate([ 0, -6, -leg_vertical_height - 1 ])
-                    prismoid(size1 = [ dovetail_horizontal_length - 8, 12 ], size2 = [ leg_spread_length - 10, 12 ], h = leg_vertical_height - 5, orient = FWD);
+                    prismoid(size1 = [ dovetail_horizontal_length - 15, 12 ], size2 = [ leg_spread_length - 20, 12 ], h = leg_vertical_height - 5, orient = FWD);
             }
             
         translate([ 0, 64 / 2 + 20 + leg_horizontal_length / 4, -leg_vertical_height + 0.5 ])
@@ -159,8 +159,8 @@ module stand()
     }
 }
 
-// rotate([ 30, 0, 0 ])
-    // holder();
+ rotate([ 30, 0, 0 ])
+    holder();
 
-// translate([ 0, 0, -64 / 2 ])
+ translate([ 0, 0, -64 / 2 ])
     stand();
