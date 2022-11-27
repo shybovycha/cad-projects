@@ -191,11 +191,9 @@ module base2_middle_section()
                 );
             
             // padding for PCB
-            translate([ 115, 76.4, 16.5 ])
+            translate([ 115 + 0.25, 76.4, 16.5 ])
                 cuboid(
-                    size = [ 65 + 10 + 2, 5, 25 ],
-                    //size2 = [ 65 + 2, 5 ],
-                    // h = 25,
+                    size = [ 65, 5 + 9, 25 ],
                     orient = BACK
                 );
         }
