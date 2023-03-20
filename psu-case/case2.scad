@@ -102,25 +102,25 @@ if (RENDER_FRONT_PANEL) {
                 
                 // cutout for the indicator
                 translate([ -0.5 * CASE_WIDTH + 46, 0, 0 ])
-                    cube([ 46, 2 * WALL_THICKNESS, 26 ], center = true);
+                    cube([ 46, 2 * WALL_THICKNESS, 27 ], center = true);
                 
                 // cutout for the output
-                translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 20, 0, 0 ])
+                translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 15, 0, 0 ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(d = 5, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
+                        cylinder(d = 5.15, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
                 
-                translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 20 + 14, 0, 0 ])
+                translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 15 + 18.5, 0, 0 ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(d = 5, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
+                        cylinder(d = 5.15, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
                 
                 // cutout for the adjustment knobs
                 translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 20 + 14 + 20, 0, 10 ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(d = 5, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
+                        cylinder(d = 10.05, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
                 
                 translate([ -0.5 * CASE_WIDTH + 46 * 1.5 + 20 + 14 + 20, 0, -10 ])
                     rotate([ 90, 0, 0 ])
-                        cylinder(d = 5, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
+                        cylinder(d = 7.05, h = 2 * WALL_THICKNESS, center = true, $fn = 64);
             }
 }
 
@@ -134,7 +134,7 @@ if (RENDER_BACK_PANEL) {
                     
                     // cutout for the power input
                     translate([ CASE_WIDTH / 2 - 50 / 2 - 14, 0, 0 ])
-                        cube([ 50, 2 * WALL_THICKNESS, 26 ], center = true);
+                        cube([ 51, 2 * WALL_THICKNESS, 27 ], center = true);
                 }
                 
                 // stands for the boost-buck converter
