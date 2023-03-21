@@ -11,8 +11,8 @@ RENDER_BACK_PANEL = false;
 
 WALL_THICKNESS = 2;
 
-CASE_WIDTH = 150;
-CASE_DEPTH = 140;
+CASE_WIDTH = 140;
+CASE_DEPTH = 130;
 CASE_HEIGHT = 60;
 
 // half
@@ -25,7 +25,7 @@ module half_case() {
             cuboid([ CASE_WIDTH + 10, CASE_DEPTH + 10, CASE_HEIGHT ]);
         
         // cut out insides
-        cuboid([ CASE_WIDTH - WALL_THICKNESS, CASE_DEPTH - 6 * WALL_THICKNESS, CASE_HEIGHT - WALL_THICKNESS ], rounding = 2, $fn = 64);
+        cuboid([ CASE_WIDTH - WALL_THICKNESS * 2, CASE_DEPTH - 6 * WALL_THICKNESS, CASE_HEIGHT - WALL_THICKNESS ], rounding = 2, $fn = 64);
         
         // cut out for the grooves for the front and back panels
         translate([ 0, 0, WALL_THICKNESS ])
@@ -34,11 +34,11 @@ module half_case() {
         // cut out the grooves themselves
         // front
         translate([ 0, CASE_DEPTH / 2 - 1.5 * WALL_THICKNESS, WALL_THICKNESS ])
-            cuboid([ CASE_WIDTH - 2 * WALL_THICKNESS, WALL_THICKNESS * 1.25, CASE_HEIGHT - 2 * WALL_THICKNESS ], rounding = 0, $fn = 64);
+            cuboid([ CASE_WIDTH - 2 * WALL_THICKNESS, WALL_THICKNESS * 1.25 + 0.3, CASE_HEIGHT - 2 * WALL_THICKNESS ], rounding = 0, $fn = 64);
         
         // back
         translate([ 0, -CASE_DEPTH / 2 + 1.5 * WALL_THICKNESS, WALL_THICKNESS ])
-            cuboid([ CASE_WIDTH - 2 * WALL_THICKNESS, WALL_THICKNESS * 1.25, CASE_HEIGHT - 2 * WALL_THICKNESS ], rounding = 0, $fn = 64);
+            cuboid([ CASE_WIDTH - 2 * WALL_THICKNESS, WALL_THICKNESS * 1.25 + 0.3, CASE_HEIGHT - 2 * WALL_THICKNESS ], rounding = 0, $fn = 64);
     }
 }
 
@@ -52,7 +52,7 @@ if (RENDER_BOTTOM) {
         half_case();
         
         // stands for the main voltage converter
-        translate([ -98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
@@ -68,7 +68,7 @@ if (RENDER_BOTTOM) {
             cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
         }
         
-        translate([ -98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
@@ -76,7 +76,7 @@ if (RENDER_BOTTOM) {
             cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
         }
         
-        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
