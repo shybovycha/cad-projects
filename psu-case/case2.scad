@@ -52,7 +52,7 @@ if (RENDER_BOTTOM) {
         half_case();
         
         // stands for the main voltage converter
-        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5 + 7, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
@@ -60,7 +60,7 @@ if (RENDER_BOTTOM) {
             cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
         }
         
-        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 33 - 5 - 5 + 7, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
@@ -68,7 +68,7 @@ if (RENDER_BOTTOM) {
             cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
         }
         
-        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ -98 / 2 - 1.5, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47 + 7, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
@@ -76,7 +76,7 @@ if (RENDER_BOTTOM) {
             cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
         }
         
-        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
+        translate([ 98 / 2, 0.5 * CASE_DEPTH - 6 * WALL_THICKNESS - 34 - 5 - 5 - 47 + 7, -CASE_HEIGHT / 2 + WALL_THICKNESS / 2 ])
         difference() {
             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
             
