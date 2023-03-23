@@ -200,11 +200,53 @@ module base2_middle_section()
     }
 }
 
+module base2_with_cut() {
+    translate([ -0.75, 0, 0 ])
+    {
+        difference()
+        {
+            union()
+            {
+                base2();
+                
+                translate([ 115 + 0.25, 72 + 20, 10 ])
+                    cuboid(
+                        size = [ 65 + 6, 20, 13 ],
+                        chamfer = 1,
+                        edges = [ BACK + RIGHT, BACK + LEFT, BACK + BOTTOM, BACK + TOP, BOTTOM + LEFT, BOTTOM + RIGHT ]
+                    );
+            }
+            
+            // padding for top of the plate
+            translate([ 115 + 0.25, 72 + 20, 10 + 7 + 4 - 4 ])
+                cuboid(
+                    size = [ 65 + 6 + 1, 22 + 5, 4 ]
+                );
+
+            // padding for PCB
+            translate([ 115 + 0.25, 72 + 20 - 6, 10 + 3.5 ])
+                cuboid(
+                    size = [ 56, 22, 10 + 5 ],
+                    chamfer = 1,
+                    edges = [ BACK + RIGHT, BACK + LEFT, BACK + BOTTOM, BACK + TOP, BOTTOM + LEFT, BOTTOM + RIGHT ]
+                );
+            
+            // padding for USB
+            translate([ 115 + 0.25 + 35, 72 + 20 - 6 - 2 + 22 / 2 - 5, 10 + 3.5 ])
+                cuboid(
+                    size = [ 15, 12, 10 ]
+                );
+        }
+    }
+}
+
+base2_with_cut();
+
 // base2_left_half();
 
 // base2_right_half();
 
-base2_middle_section();
+// base2_middle_section();
 
 // translate([ 0, 0, 15 ])
 // plate();

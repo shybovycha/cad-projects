@@ -132,12 +132,12 @@ if (RENDER_BACK_PANEL) {
                     panel();
                     
                     // cutout for the power input
-                    translate([ CASE_WIDTH / 2 - 50 / 2 - 14, 0, 0 ])
-                        cube([ 51, 2 * WALL_THICKNESS, 27 ], center = true);
+                    translate([ CASE_WIDTH / 2 - 50 / 2 - 10, 0, 0 ])
+                        cube([ 47.5, 2 * WALL_THICKNESS, 27.6 ], center = true);
                 }
                 
                 // stands for the boost-buck converter
-                translate([ -(2), 0, (26 / 2) ])
+                translate([ 0, 1, (26 / 2) ])
                     rotate([ 90, 0, 0 ])
                         difference() {
                             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
@@ -146,7 +146,7 @@ if (RENDER_BACK_PANEL) {
                                 cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
                         }
                         
-                translate([ -(2), 0, -(26 / 2) ])
+                translate([ 0, 1, -(26 / 2) ])
                     rotate([ 90, 0, 0 ])
                         difference() {
                             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
@@ -155,7 +155,7 @@ if (RENDER_BACK_PANEL) {
                                 cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
                         }
                         
-                translate([ -(2 + 58), 0, (26 / 2) ])
+                translate([ -58, 1, (26 / 2) ])
                     rotate([ 90, 0, 0 ])
                         difference() {
                             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
@@ -164,7 +164,7 @@ if (RENDER_BACK_PANEL) {
                                 cylinder(h = WALL_THICKNESS, d = 4, $fn = 64);
                         }
                         
-                translate([ -(2 + 58), 0, -(26 / 2) ])
+                translate([ -58, 1, -(26 / 2) ])
                     rotate([ 90, 0, 0 ])
                         difference() {
                             cylinder(h = 2 * WALL_THICKNESS, d = 4 + WALL_THICKNESS * 2, $fn = 64);
